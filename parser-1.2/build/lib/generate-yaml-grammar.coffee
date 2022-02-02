@@ -270,12 +270,14 @@ global.YamlGrammarGenerator = class YamlGrammarGenerator
     if multiline
       sep = "\n"
       args = args.map (a)=> @indent @string a
-      args = args.join(",#{sep}")
+      args = args.join("#{@arg_seperator}#{sep}")
     else
       args = args.map (a)=> @string a
-      args = args.join(", ")
+      args = args.join("#{@arg_seperator} ")
 
     return [args, sep]
+
+  arg_seperator: ","
 
   gen_arg: (arg)->
     @arg = true
@@ -305,11 +307,13 @@ global.YamlGrammarGenerator = class YamlGrammarGenerator
       if m = line.match /^:(\d+):/
         num = m[1]
         key = "#{num}"
-        comments[key] = "# [#{num}]\n"
+        comments[key] = "#{@comment_char} [#{num}]\n"
         while (line = lines.shift())?
           break unless line.match /^# /
-          comments[key] += line + '\n'
+          comments[key] += (line + '\n').replace /^#/, "#{@comment_char}"
     comments
+
+  comment_char: "#"
 
   not_implemented: (method)->
     class_ = @constructor.name

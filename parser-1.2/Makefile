@@ -6,6 +6,7 @@ ALL := \
     coffeescript \
     javascript \
     perl \
+    scheme \
 
 ALL_BUILD := $(ALL:%=build-%)
 ALL_TEST := $(ALL:%=test-%)
