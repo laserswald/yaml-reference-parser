@@ -27,6 +27,12 @@ global.YamlGrammarGenerator = class YamlGrammarGenerator
 
     @grammar
 
+  for_each_rule: (fn) ->
+    for name in _.keys(@spec)
+      continue if name[0] == ':'
+      rule = @read_rule name
+      fn(rule)
+
   gen_grammar_head: -> @not_implemented('gen_grammar_head')
 
   gen_grammar_info: ->
@@ -38,7 +44,7 @@ global.YamlGrammarGenerator = class YamlGrammarGenerator
 
   gen_grammar_tail: => ''
 
-  gen_rule: (name)->
+  read_rule: (name) ->
     @setm = ''
     if @spec[name]['(->m)']
       delete @spec[name]['(->m)']
@@ -46,13 +52,26 @@ global.YamlGrammarGenerator = class YamlGrammarGenerator
     else if @spec[name]['(m>0)']
       delete @spec[name]['(m>0)']
       @setm = @gen_setm true
+
+
     num = @num = @nums[name][1..]
-    comment = @comments[num]
-    rule_name = @rule_name name
-    debug_args = @gen_debug_args name
-    rule_args = @gen_rule_args name
-    rule_body = @indent(@gen @spec[name])
-    @gen_rule_code num, comment, rule_name, debug_args, rule_args, rule_body
+
+    return
+      num: num
+      comment: @comments[num]
+      rule_name: @rule_name name
+      debug_args: @gen_debug_args name
+      rule_args: @gen_rule_args name
+      rule_body: @indent(@gen @spec[name])
+
+  gen_rule: (name)->
+    rule = @read_rule name
+    @gen_rule_code rule.num,
+      rule.comment,
+      rule.rule_name,
+      rule.debug_args,
+      rule.rule_args,
+      rule.rule_body
 
   gen_rule_code: -> @not_implemented('gen_rule_code')
 
@@ -143,16 +162,7 @@ global.YamlGrammarGenerator = class YamlGrammarGenerator
     if rule.match(/^(?:b|c|e|l|nb|ns|s)(?:[-+][a-z0-9]+)+$/)
       return @gen_method_ref @rule_name rule
     if rule.length == 1
-      if rule == "'"
-        return @gen_method_call 'chr', "\"'\""
-      if rule == "\\"
-        return @gen_method_call 'chr', "\"\\\\\""
-      if @arg
-        if rule in ['m', 't']
-          if not(rule in @args) and not(@setm)
-            return @gen_method_call rule
-        return @gen_var_value rule
-      return @gen_method_call 'chr', "'#{rule}'"
+      return @gen_char rule
     if rule.match(/^(flow|block)-(in|out|key)$/) or
       rule in ['auto-detect', 'strip', 'clip', 'keep']
         return '"' + rule + '"'
@@ -162,6 +172,18 @@ global.YamlGrammarGenerator = class YamlGrammarGenerator
       return @gen_method_ref 'match'
 
     xxx "[#{@num}] Unknown string rule type", rule
+
+  gen_char: (rule) ->
+    if rule == "'"
+      return @gen_method_call 'chr', "\"'\""
+    if rule == "\\"
+      return @gen_method_call 'chr', "\"\\\\\""
+    if @arg
+      if rule in ['m', 't']
+        if not(rule in @args) and not(@setm)
+          return @gen_method_call rule
+      return @gen_var_value rule
+    return @gen_method_call 'chr', "'#{rule}'"
 
   gen_var_value: (var_)-> var_
 
@@ -269,10 +291,12 @@ global.YamlGrammarGenerator = class YamlGrammarGenerator
           multiline = true
     if multiline
       sep = "\n"
-      args = args.map (a)=> @indent @string a
+      args = args.map (a)=>
+        @indent @string a
       args = args.join("#{@arg_seperator}#{sep}")
     else
-      args = args.map (a)=> @string a
+      args = args.map (a)=>
+        @string a
       args = args.join("#{@arg_seperator} ")
 
     return [args, sep]

@@ -2,9 +2,15 @@
 ;;; This grammar class was generated from https://yaml.org/spec/1.2/spec.html
 ;;;
 
-(load "prelude.scm")
+
+(import (scheme base)
+        (scheme read)
+        (scheme write))
+
+(include "prelude.scm")
+
 (define +debug+ (get-environment-variable "DEBUG"))
-;;; 000: TOP
+
 
 
 ; [001]
@@ -13,16 +19,19 @@
 ;   | x:85 | [x:A0-x:D7FF] | [x:E000-x:FFFD]
 ;   | [x:10000-x:10FFFF]
 
-(define (c_printable self)
-  (when +debug+ (debug-rule "c_printable"))
-  ((self 'any)   ((self 'chr) "\x{09}")
-    ((self 'chr) "\x{0A}")
-    ((self 'chr) "\x{0D}")
-    ((self 'rng) "\x{20}" "\x{7E}")
-    ((self 'chr) "\x{85}")
-    ((self 'rng) "\x{A0}" "\x{D7FF}")
-    ((self 'rng) "\x{E000}" "\x{FFFD}")
-    ((self 'rng) "\x{010000}" "\x{10FFFF}")))
+(define (yaml-parser-parse!/c-printable self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-printable"))
+  (any     (chr #\x09)
+      (chr #\x0A)
+      (chr #\x0D)
+      (rng #\x20 #\x7E)
+      (chr #\x85)
+      (rng #\xA0 #\xD7FF)
+      (rng #\xE000 #\xFFFD)
+      (rng #\x010000 #\x10FFFF)))
 
 
 
@@ -30,10 +39,13 @@
 ; nb-json ::=
 ;   x:9 | [x:20-x:10FFFF]
 
-(define (nb_json self)
-  (when +debug+ (debug-rule "nb_json"))
-  ((self 'any)   ((self 'chr) "\x{09}")
-    ((self 'rng) "\x{20}" "\x{10FFFF}")))
+(define (yaml-parser-parse!/nb-json self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-json"))
+  (any     (chr #\x09)
+      (rng #\x20 #\x10FFFF)))
 
 
 
@@ -41,9 +53,12 @@
 ; c-byte-order-mark ::=
 ;   x:FEFF
 
-(define (c_byte_order_mark self)
-  (when +debug+ (debug-rule "c_byte_order_mark"))
-  ((self 'chr) "\x{FEFF}"))
+(define (yaml-parser-parse!/c-byte-order-mark self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-byte-order-mark"))
+  (chr #\xFEFF))
 
 
 
@@ -51,9 +66,12 @@
 ; c-sequence-entry ::=
 ;   '-'
 
-(define (c_sequence_entry self)
-  (when +debug+ (debug-rule "c_sequence_entry"))
-  ((self 'chr) '-'))
+(define (yaml-parser-parse!/c-sequence-entry self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-sequence-entry"))
+  (chr #\-))
 
 
 
@@ -61,9 +79,12 @@
 ; c-mapping-key ::=
 ;   '?'
 
-(define (c_mapping_key self)
-  (when +debug+ (debug-rule "c_mapping_key"))
-  ((self 'chr) '?'))
+(define (yaml-parser-parse!/c-mapping-key self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-mapping-key"))
+  (chr #\?))
 
 
 
@@ -71,9 +92,12 @@
 ; c-mapping-value ::=
 ;   ':'
 
-(define (c_mapping_value self)
-  (when +debug+ (debug-rule "c_mapping_value"))
-  ((self 'chr) ':'))
+(define (yaml-parser-parse!/c-mapping-value self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-mapping-value"))
+  (chr #\:))
 
 
 
@@ -81,9 +105,12 @@
 ; c-collect-entry ::=
 ;   ','
 
-(define (c_collect_entry self)
-  (when +debug+ (debug-rule "c_collect_entry"))
-  ((self 'chr) ','))
+(define (yaml-parser-parse!/c-collect-entry self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-collect-entry"))
+  (chr #\,))
 
 
 
@@ -91,9 +118,12 @@
 ; c-sequence-start ::=
 ;   '['
 
-(define (c_sequence_start self)
-  (when +debug+ (debug-rule "c_sequence_start"))
-  ((self 'chr) '['))
+(define (yaml-parser-parse!/c-sequence-start self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-sequence-start"))
+  (chr #\[))
 
 
 
@@ -101,9 +131,12 @@
 ; c-sequence-end ::=
 ;   ']'
 
-(define (c_sequence_end self)
-  (when +debug+ (debug-rule "c_sequence_end"))
-  ((self 'chr) ']'))
+(define (yaml-parser-parse!/c-sequence-end self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-sequence-end"))
+  (chr #\]))
 
 
 
@@ -111,9 +144,12 @@
 ; c-mapping-start ::=
 ;   '{'
 
-(define (c_mapping_start self)
-  (when +debug+ (debug-rule "c_mapping_start"))
-  ((self 'chr) '{'))
+(define (yaml-parser-parse!/c-mapping-start self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-mapping-start"))
+  (chr #\{))
 
 
 
@@ -121,9 +157,12 @@
 ; c-mapping-end ::=
 ;   '}'
 
-(define (c_mapping_end self)
-  (when +debug+ (debug-rule "c_mapping_end"))
-  ((self 'chr) '}'))
+(define (yaml-parser-parse!/c-mapping-end self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-mapping-end"))
+  (chr #\}))
 
 
 
@@ -131,9 +170,12 @@
 ; c-comment ::=
 ;   '#'
 
-(define (c_comment self)
-  (when +debug+ (debug-rule "c_comment"))
-  ((self 'chr) '#'))
+(define (yaml-parser-parse!/c-comment self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-comment"))
+  (chr #\#))
 
 
 
@@ -141,9 +183,12 @@
 ; c-anchor ::=
 ;   '&'
 
-(define (c_anchor self)
-  (when +debug+ (debug-rule "c_anchor"))
-  ((self 'chr) '&'))
+(define (yaml-parser-parse!/c-anchor self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-anchor"))
+  (chr #\&))
 
 
 
@@ -151,9 +196,12 @@
 ; c-alias ::=
 ;   '*'
 
-(define (c_alias self)
-  (when +debug+ (debug-rule "c_alias"))
-  ((self 'chr) '*'))
+(define (yaml-parser-parse!/c-alias self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-alias"))
+  (chr #\*))
 
 
 
@@ -161,9 +209,12 @@
 ; c-tag ::=
 ;   '!'
 
-(define (c_tag self)
-  (when +debug+ (debug-rule "c_tag"))
-  ((self 'chr) '!'))
+(define (yaml-parser-parse!/c-tag self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-tag"))
+  (chr #\!))
 
 
 
@@ -171,9 +222,12 @@
 ; c-literal ::=
 ;   '|'
 
-(define (c_literal self)
-  (when +debug+ (debug-rule "c_literal"))
-  ((self 'chr) '|'))
+(define (yaml-parser-parse!/c-literal self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-literal"))
+  (chr #\|))
 
 
 
@@ -181,9 +235,12 @@
 ; c-folded ::=
 ;   '>'
 
-(define (c_folded self)
-  (when +debug+ (debug-rule "c_folded"))
-  ((self 'chr) '>'))
+(define (yaml-parser-parse!/c-folded self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-folded"))
+  (chr #\>))
 
 
 
@@ -191,9 +248,12 @@
 ; c-single-quote ::=
 ;   '''
 
-(define (c_single_quote self)
-  (when +debug+ (debug-rule "c_single_quote"))
-  ((self 'chr) "'"))
+(define (yaml-parser-parse!/c-single-quote self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-single-quote"))
+  (chr #\'))
 
 
 
@@ -201,9 +261,12 @@
 ; c-double-quote ::=
 ;   '"'
 
-(define (c_double_quote self)
-  (when +debug+ (debug-rule "c_double_quote"))
-  ((self 'chr) '"'))
+(define (yaml-parser-parse!/c-double-quote self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-double-quote"))
+  (chr #\"))
 
 
 
@@ -211,9 +274,12 @@
 ; c-directive ::=
 ;   '%'
 
-(define (c_directive self)
-  (when +debug+ (debug-rule "c_directive"))
-  ((self 'chr) '%'))
+(define (yaml-parser-parse!/c-directive self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-directive"))
+  (chr #\%))
 
 
 
@@ -221,10 +287,13 @@
 ; c-reserved ::=
 ;   '@' | '`'
 
-(define (c_reserved self)
-  (when +debug+ (debug-rule "c_reserved"))
-  ((self 'any)   ((self 'chr) '@')
-    ((self 'chr) '`')))
+(define (yaml-parser-parse!/c-reserved self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-reserved"))
+  (any     (chr #\@)
+      (chr #\`)))
 
 
 
@@ -234,27 +303,30 @@
 ;   | '#' | '&' | '*' | '!' | '|' | '>' | ''' | '"'
 ;   | '%' | '@' | '`'
 
-(define (c_indicator self)
-  (when +debug+ (debug-rule "c_indicator"))
-  ((self 'any)   ((self 'chr) '-')
-    ((self 'chr) '?')
-    ((self 'chr) ':')
-    ((self 'chr) ',')
-    ((self 'chr) '[')
-    ((self 'chr) ']')
-    ((self 'chr) '{')
-    ((self 'chr) '}')
-    ((self 'chr) '#')
-    ((self 'chr) '&')
-    ((self 'chr) '*')
-    ((self 'chr) '!')
-    ((self 'chr) '|')
-    ((self 'chr) '>')
-    ((self 'chr) "'")
-    ((self 'chr) '"')
-    ((self 'chr) '%')
-    ((self 'chr) '@')
-    ((self 'chr) '`')))
+(define (yaml-parser-parse!/c-indicator self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-indicator"))
+  (any     (chr #\-)
+      (chr #\?)
+      (chr #\:)
+      (chr #\,)
+      (chr #\[)
+      (chr #\])
+      (chr #\{)
+      (chr #\})
+      (chr #\#)
+      (chr #\&)
+      (chr #\*)
+      (chr #\!)
+      (chr #\|)
+      (chr #\>)
+      (chr #\')
+      (chr #\")
+      (chr #\%)
+      (chr #\@)
+      (chr #\`)))
 
 
 
@@ -262,13 +334,16 @@
 ; c-flow-indicator ::=
 ;   ',' | '[' | ']' | '{' | '}'
 
-(define (c_flow_indicator self)
-  (when +debug+ (debug-rule "c_flow_indicator"))
-  ((self 'any)   ((self 'chr) ',')
-    ((self 'chr) '[')
-    ((self 'chr) ']')
-    ((self 'chr) '{')
-    ((self 'chr) '}')))
+(define (yaml-parser-parse!/c-flow-indicator self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-flow-indicator"))
+  (any     (chr #\,)
+      (chr #\[)
+      (chr #\])
+      (chr #\{)
+      (chr #\})))
 
 
 
@@ -276,9 +351,12 @@
 ; b-line-feed ::=
 ;   x:A
 
-(define (b_line_feed self)
-  (when +debug+ (debug-rule "b_line_feed"))
-  ((self 'chr) "\x{0A}"))
+(define (yaml-parser-parse!/b-line-feed self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-line-feed"))
+  (chr #\x0A))
 
 
 
@@ -286,9 +364,12 @@
 ; b-carriage-return ::=
 ;   x:D
 
-(define (b_carriage_return self)
-  (when +debug+ (debug-rule "b_carriage_return"))
-  ((self 'chr) "\x{0D}"))
+(define (yaml-parser-parse!/b-carriage-return self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-carriage-return"))
+  (chr #\x0D))
 
 
 
@@ -296,10 +377,13 @@
 ; b-char ::=
 ;   b-line-feed | b-carriage-return
 
-(define (b_char self)
-  (when +debug+ (debug-rule "b_char"))
-  ((self 'any)   b_line_feed
-    b_carriage_return))
+(define (yaml-parser-parse!/b-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-char"))
+  (any     yaml-parser-parse!/b-line-feed
+      yaml-parser-parse!/b-carriage-return))
 
 
 
@@ -307,11 +391,14 @@
 ; nb-char ::=
 ;   c-printable - b-char - c-byte-order-mark
 
-(define (nb_char self)
-  (when +debug+ (debug-rule "nb_char"))
-  ((self 'but)   c_printable
-    b_char
-    c_byte_order_mark))
+(define (yaml-parser-parse!/nb-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-char"))
+  (but     yaml-parser-parse!/c-printable
+      yaml-parser-parse!/b-char
+      yaml-parser-parse!/c-byte-order-mark))
 
 
 
@@ -321,12 +408,15 @@
 ;   | b-carriage-return
 ;   | b-line-feed
 
-(define (b_break self)
-  (when +debug+ (debug-rule "b_break"))
-  ((self 'any)   ((self 'all)   b_carriage_return
-      b_line_feed)
-    b_carriage_return
-    b_line_feed))
+(define (yaml-parser-parse!/b-break self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-break"))
+  (any     (all     yaml-parser-parse!/b-carriage-return
+          yaml-parser-parse!/b-line-feed)
+      yaml-parser-parse!/b-carriage-return
+      yaml-parser-parse!/b-line-feed))
 
 
 
@@ -334,9 +424,12 @@
 ; b-as-line-feed ::=
 ;   b-break
 
-(define (b_as_line_feed self)
-  (when +debug+ (debug-rule "b_as_line_feed"))
-  b_break)
+(define (yaml-parser-parse!/b-as-line-feed self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-as-line-feed"))
+  yaml-parser-parse!/b-break)
 
 
 
@@ -344,9 +437,12 @@
 ; b-non-content ::=
 ;   b-break
 
-(define (b_non_content self)
-  (when +debug+ (debug-rule "b_non_content"))
-  b_break)
+(define (yaml-parser-parse!/b-non-content self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-non-content"))
+  yaml-parser-parse!/b-break)
 
 
 
@@ -354,9 +450,12 @@
 ; s-space ::=
 ;   x:20
 
-(define (s_space self)
-  (when +debug+ (debug-rule "s_space"))
-  ((self 'chr) "\x{20}"))
+(define (yaml-parser-parse!/s-space self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-space"))
+  (chr #\x20))
 
 
 
@@ -364,9 +463,12 @@
 ; s-tab ::=
 ;   x:9
 
-(define (s_tab self)
-  (when +debug+ (debug-rule "s_tab"))
-  ((self 'chr) "\x{09}"))
+(define (yaml-parser-parse!/s-tab self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-tab"))
+  (chr #\x09))
 
 
 
@@ -374,10 +476,13 @@
 ; s-white ::=
 ;   s-space | s-tab
 
-(define (s_white self)
-  (when +debug+ (debug-rule "s_white"))
-  ((self 'any)   s_space
-    s_tab))
+(define (yaml-parser-parse!/s-white self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-white"))
+  (any     yaml-parser-parse!/s-space
+      yaml-parser-parse!/s-tab))
 
 
 
@@ -385,10 +490,13 @@
 ; ns-char ::=
 ;   nb-char - s-white
 
-(define (ns_char self)
-  (when +debug+ (debug-rule "ns_char"))
-  ((self 'but)   nb_char
-    s_white))
+(define (yaml-parser-parse!/ns-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-char"))
+  (but     yaml-parser-parse!/nb-char
+      yaml-parser-parse!/s-white))
 
 
 
@@ -396,9 +504,12 @@
 ; ns-dec-digit ::=
 ;   [x:30-x:39]
 
-(define (ns_dec_digit self)
-  (when +debug+ (debug-rule "ns_dec_digit"))
-  ((self 'rng) "\x{30}" "\x{39}"))
+(define (yaml-parser-parse!/ns-dec-digit self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-dec-digit"))
+  (rng #\x30 #\x39))
 
 
 
@@ -407,11 +518,14 @@
 ;   ns-dec-digit
 ;   | [x:41-x:46] | [x:61-x:66]
 
-(define (ns_hex_digit self)
-  (when +debug+ (debug-rule "ns_hex_digit"))
-  ((self 'any)   ns_dec_digit
-    ((self 'rng) "\x{41}" "\x{46}")
-    ((self 'rng) "\x{61}" "\x{66}")))
+(define (yaml-parser-parse!/ns-hex-digit self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-hex-digit"))
+  (any     yaml-parser-parse!/ns-dec-digit
+      (rng #\x41 #\x46)
+      (rng #\x61 #\x66)))
 
 
 
@@ -419,10 +533,13 @@
 ; ns-ascii-letter ::=
 ;   [x:41-x:5A] | [x:61-x:7A]
 
-(define (ns_ascii_letter self)
-  (when +debug+ (debug-rule "ns_ascii_letter"))
-  ((self 'any)   ((self 'rng) "\x{41}" "\x{5A}")
-    ((self 'rng) "\x{61}" "\x{7A}")))
+(define (yaml-parser-parse!/ns-ascii-letter self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-ascii-letter"))
+  (any     (rng #\x41 #\x5A)
+      (rng #\x61 #\x7A)))
 
 
 
@@ -430,11 +547,14 @@
 ; ns-word-char ::=
 ;   ns-dec-digit | ns-ascii-letter | '-'
 
-(define (ns_word_char self)
-  (when +debug+ (debug-rule "ns_word_char"))
-  ((self 'any)   ns_dec_digit
-    ns_ascii_letter
-    ((self 'chr) '-')))
+(define (yaml-parser-parse!/ns-word-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-word-char"))
+  (any     yaml-parser-parse!/ns-dec-digit
+      yaml-parser-parse!/ns-ascii-letter
+      (chr #\-)))
 
 
 
@@ -444,33 +564,36 @@
 ;   | ';' | '/' | '?' | ':' | '@' | '&' | '=' | '+' | '$' | ','
 ;   | '_' | '.' | '!' | '~' | '*' | ''' | '(' | ')' | '[' | ']'
 
-(define (ns_uri_char self)
-  (when +debug+ (debug-rule "ns_uri_char"))
-  ((self 'any)   ((self 'all)   ((self 'chr) '%')
-      ns_hex_digit
-      ns_hex_digit)
-    ns_word_char
-    ((self 'chr) '#')
-    ((self 'chr) ';')
-    ((self 'chr) '/')
-    ((self 'chr) '?')
-    ((self 'chr) ':')
-    ((self 'chr) '@')
-    ((self 'chr) '&')
-    ((self 'chr) '=')
-    ((self 'chr) '+')
-    ((self 'chr) '$')
-    ((self 'chr) ',')
-    ((self 'chr) '_')
-    ((self 'chr) '.')
-    ((self 'chr) '!')
-    ((self 'chr) '~')
-    ((self 'chr) '*')
-    ((self 'chr) "'")
-    ((self 'chr) '(')
-    ((self 'chr) ')')
-    ((self 'chr) '[')
-    ((self 'chr) ']')))
+(define (yaml-parser-parse!/ns-uri-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-uri-char"))
+  (any     (all     (chr #\%)
+          yaml-parser-parse!/ns-hex-digit
+          yaml-parser-parse!/ns-hex-digit)
+      yaml-parser-parse!/ns-word-char
+      (chr #\#)
+      (chr #\;)
+      (chr #\/)
+      (chr #\?)
+      (chr #\:)
+      (chr #\@)
+      (chr #\&)
+      (chr #\=)
+      (chr #\+)
+      (chr #\$)
+      (chr #\,)
+      (chr #\_)
+      (chr #\.)
+      (chr #\!)
+      (chr #\~)
+      (chr #\*)
+      (chr #\')
+      (chr #\()
+      (chr #\))
+      (chr #\[)
+      (chr #\])))
 
 
 
@@ -478,11 +601,14 @@
 ; ns-tag-char ::=
 ;   ns-uri-char - '!' - c-flow-indicator
 
-(define (ns_tag_char self)
-  (when +debug+ (debug-rule "ns_tag_char"))
-  ((self 'but)   ns_uri_char
-    ((self 'chr) '!')
-    c_flow_indicator))
+(define (yaml-parser-parse!/ns-tag-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-tag-char"))
+  (but     yaml-parser-parse!/ns-uri-char
+      (chr #\!)
+      yaml-parser-parse!/c-flow-indicator))
 
 
 
@@ -490,9 +616,12 @@
 ; c-escape ::=
 ;   '\'
 
-(define (c_escape self)
-  (when +debug+ (debug-rule "c_escape"))
-  ((self 'chr) "\\"))
+(define (yaml-parser-parse!/c-escape self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-escape"))
+  (chr #\\))
 
 
 
@@ -500,9 +629,12 @@
 ; ns-esc-null ::=
 ;   '0'
 
-(define (ns_esc_null self)
-  (when +debug+ (debug-rule "ns_esc_null"))
-  ((self 'chr) '0'))
+(define (yaml-parser-parse!/ns-esc-null self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-null"))
+  (chr #\0))
 
 
 
@@ -510,9 +642,12 @@
 ; ns-esc-bell ::=
 ;   'a'
 
-(define (ns_esc_bell self)
-  (when +debug+ (debug-rule "ns_esc_bell"))
-  ((self 'chr) 'a'))
+(define (yaml-parser-parse!/ns-esc-bell self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-bell"))
+  (chr #\a))
 
 
 
@@ -520,9 +655,12 @@
 ; ns-esc-backspace ::=
 ;   'b'
 
-(define (ns_esc_backspace self)
-  (when +debug+ (debug-rule "ns_esc_backspace"))
-  ((self 'chr) 'b'))
+(define (yaml-parser-parse!/ns-esc-backspace self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-backspace"))
+  (chr #\b))
 
 
 
@@ -530,10 +668,13 @@
 ; ns-esc-horizontal-tab ::=
 ;   't' | x:9
 
-(define (ns_esc_horizontal_tab self)
-  (when +debug+ (debug-rule "ns_esc_horizontal_tab"))
-  ((self 'any)   ((self 'chr) 't')
-    ((self 'chr) "\x{09}")))
+(define (yaml-parser-parse!/ns-esc-horizontal-tab self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-horizontal-tab"))
+  (any     (chr #\t)
+      (chr #\x09)))
 
 
 
@@ -541,9 +682,12 @@
 ; ns-esc-line-feed ::=
 ;   'n'
 
-(define (ns_esc_line_feed self)
-  (when +debug+ (debug-rule "ns_esc_line_feed"))
-  ((self 'chr) 'n'))
+(define (yaml-parser-parse!/ns-esc-line-feed self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-line-feed"))
+  (chr #\n))
 
 
 
@@ -551,9 +695,12 @@
 ; ns-esc-vertical-tab ::=
 ;   'v'
 
-(define (ns_esc_vertical_tab self)
-  (when +debug+ (debug-rule "ns_esc_vertical_tab"))
-  ((self 'chr) 'v'))
+(define (yaml-parser-parse!/ns-esc-vertical-tab self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-vertical-tab"))
+  (chr #\v))
 
 
 
@@ -561,9 +708,12 @@
 ; ns-esc-form-feed ::=
 ;   'f'
 
-(define (ns_esc_form_feed self)
-  (when +debug+ (debug-rule "ns_esc_form_feed"))
-  ((self 'chr) 'f'))
+(define (yaml-parser-parse!/ns-esc-form-feed self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-form-feed"))
+  (chr #\f))
 
 
 
@@ -571,9 +721,12 @@
 ; ns-esc-carriage-return ::=
 ;   'r'
 
-(define (ns_esc_carriage_return self)
-  (when +debug+ (debug-rule "ns_esc_carriage_return"))
-  ((self 'chr) 'r'))
+(define (yaml-parser-parse!/ns-esc-carriage-return self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-carriage-return"))
+  (chr #\r))
 
 
 
@@ -581,9 +734,12 @@
 ; ns-esc-escape ::=
 ;   'e'
 
-(define (ns_esc_escape self)
-  (when +debug+ (debug-rule "ns_esc_escape"))
-  ((self 'chr) 'e'))
+(define (yaml-parser-parse!/ns-esc-escape self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-escape"))
+  (chr #\e))
 
 
 
@@ -591,9 +747,12 @@
 ; ns-esc-space ::=
 ;   x:20
 
-(define (ns_esc_space self)
-  (when +debug+ (debug-rule "ns_esc_space"))
-  ((self 'chr) "\x{20}"))
+(define (yaml-parser-parse!/ns-esc-space self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-space"))
+  (chr #\x20))
 
 
 
@@ -601,9 +760,12 @@
 ; ns-esc-double-quote ::=
 ;   '"'
 
-(define (ns_esc_double_quote self)
-  (when +debug+ (debug-rule "ns_esc_double_quote"))
-  ((self 'chr) '"'))
+(define (yaml-parser-parse!/ns-esc-double-quote self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-double-quote"))
+  (chr #\"))
 
 
 
@@ -611,9 +773,12 @@
 ; ns-esc-slash ::=
 ;   '/'
 
-(define (ns_esc_slash self)
-  (when +debug+ (debug-rule "ns_esc_slash"))
-  ((self 'chr) '/'))
+(define (yaml-parser-parse!/ns-esc-slash self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-slash"))
+  (chr #\/))
 
 
 
@@ -621,9 +786,12 @@
 ; ns-esc-backslash ::=
 ;   '\'
 
-(define (ns_esc_backslash self)
-  (when +debug+ (debug-rule "ns_esc_backslash"))
-  ((self 'chr) "\\"))
+(define (yaml-parser-parse!/ns-esc-backslash self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-backslash"))
+  (chr #\\))
 
 
 
@@ -631,9 +799,12 @@
 ; ns-esc-next-line ::=
 ;   'N'
 
-(define (ns_esc_next_line self)
-  (when +debug+ (debug-rule "ns_esc_next_line"))
-  ((self 'chr) 'N'))
+(define (yaml-parser-parse!/ns-esc-next-line self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-next-line"))
+  (chr #\N))
 
 
 
@@ -641,9 +812,12 @@
 ; ns-esc-non-breaking-space ::=
 ;   '_'
 
-(define (ns_esc_non_breaking_space self)
-  (when +debug+ (debug-rule "ns_esc_non_breaking_space"))
-  ((self 'chr) '_'))
+(define (yaml-parser-parse!/ns-esc-non-breaking-space self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-non-breaking-space"))
+  (chr #\_))
 
 
 
@@ -651,9 +825,12 @@
 ; ns-esc-line-separator ::=
 ;   'L'
 
-(define (ns_esc_line_separator self)
-  (when +debug+ (debug-rule "ns_esc_line_separator"))
-  ((self 'chr) 'L'))
+(define (yaml-parser-parse!/ns-esc-line-separator self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-line-separator"))
+  (chr #\L))
 
 
 
@@ -661,9 +838,12 @@
 ; ns-esc-paragraph-separator ::=
 ;   'P'
 
-(define (ns_esc_paragraph_separator self)
-  (when +debug+ (debug-rule "ns_esc_paragraph_separator"))
-  ((self 'chr) 'P'))
+(define (yaml-parser-parse!/ns-esc-paragraph-separator self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-paragraph-separator"))
+  (chr #\P))
 
 
 
@@ -672,10 +852,13 @@
 ;   'x'
 ;   ( ns-hex-digit{2} )
 
-(define (ns_esc_8_bit self)
-  (when +debug+ (debug-rule "ns_esc_8_bit"))
-  ((self 'all)   ((self 'chr) 'x')
-    ((self 'rep) 2 2 ns_hex_digit)))
+(define (yaml-parser-parse!/ns-esc-8-bit self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-8-bit"))
+  (all     (chr #\x)
+      (rep 2 2 yaml-parser-parse!/ns-hex-digit)))
 
 
 
@@ -684,10 +867,13 @@
 ;   'u'
 ;   ( ns-hex-digit{4} )
 
-(define (ns_esc_16_bit self)
-  (when +debug+ (debug-rule "ns_esc_16_bit"))
-  ((self 'all)   ((self 'chr) 'u')
-    ((self 'rep) 4 4 ns_hex_digit)))
+(define (yaml-parser-parse!/ns-esc-16-bit self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-16-bit"))
+  (all     (chr #\u)
+      (rep 4 4 yaml-parser-parse!/ns-hex-digit)))
 
 
 
@@ -696,10 +882,13 @@
 ;   'U'
 ;   ( ns-hex-digit{8} )
 
-(define (ns_esc_32_bit self)
-  (when +debug+ (debug-rule "ns_esc_32_bit"))
-  ((self 'all)   ((self 'chr) 'U')
-    ((self 'rep) 8 8 ns_hex_digit)))
+(define (yaml-parser-parse!/ns-esc-32-bit self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-esc-32-bit"))
+  (all     (chr #\U)
+      (rep 8 8 yaml-parser-parse!/ns-hex-digit)))
 
 
 
@@ -715,29 +904,32 @@
 ;   | ns-esc-line-separator | ns-esc-paragraph-separator
 ;   | ns-esc-8-bit | ns-esc-16-bit | ns-esc-32-bit )
 
-(define (c_ns_esc_char self)
-  (when +debug+ (debug-rule "c_ns_esc_char"))
-  ((self 'all)   ((self 'chr) "\\")
-    ((self 'any)   ns_esc_null
-      ns_esc_bell
-      ns_esc_backspace
-      ns_esc_horizontal_tab
-      ns_esc_line_feed
-      ns_esc_vertical_tab
-      ns_esc_form_feed
-      ns_esc_carriage_return
-      ns_esc_escape
-      ns_esc_space
-      ns_esc_double_quote
-      ns_esc_slash
-      ns_esc_backslash
-      ns_esc_next_line
-      ns_esc_non_breaking_space
-      ns_esc_line_separator
-      ns_esc_paragraph_separator
-      ns_esc_8_bit
-      ns_esc_16_bit
-      ns_esc_32_bit)))
+(define (yaml-parser-parse!/c-ns-esc-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-esc-char"))
+  (all     (chr #\\)
+      (any     yaml-parser-parse!/ns-esc-null
+          yaml-parser-parse!/ns-esc-bell
+          yaml-parser-parse!/ns-esc-backspace
+          yaml-parser-parse!/ns-esc-horizontal-tab
+          yaml-parser-parse!/ns-esc-line-feed
+          yaml-parser-parse!/ns-esc-vertical-tab
+          yaml-parser-parse!/ns-esc-form-feed
+          yaml-parser-parse!/ns-esc-carriage-return
+          yaml-parser-parse!/ns-esc-escape
+          yaml-parser-parse!/ns-esc-space
+          yaml-parser-parse!/ns-esc-double-quote
+          yaml-parser-parse!/ns-esc-slash
+          yaml-parser-parse!/ns-esc-backslash
+          yaml-parser-parse!/ns-esc-next-line
+          yaml-parser-parse!/ns-esc-non-breaking-space
+          yaml-parser-parse!/ns-esc-line-separator
+          yaml-parser-parse!/ns-esc-paragraph-separator
+          yaml-parser-parse!/ns-esc-8-bit
+          yaml-parser-parse!/ns-esc-16-bit
+          yaml-parser-parse!/ns-esc-32-bit)))
 
 
 
@@ -745,9 +937,12 @@
 ; s-indent(n) ::=
 ;   s-space{n}
 
-(define (s_indent self n)
-  (when +debug+ (debug-rule "s_indent",n))
-  ((self 'rep) n n s_space))
+(define (yaml-parser-parse!/s-indent self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-indent",n))
+  (rep n n yaml-parser-parse!/s-space))
 
 
 
@@ -755,10 +950,13 @@
 ; s-indent(<n) ::=
 ;   s-space{m} <where_m_<_n>
 
-(define (s_indent_lt self n)
-  (when +debug+ (debug-rule "s_indent_lt",n))
-  ((self 'may)   ((self 'all)   ((self 'rep) 0 #f s_space)
-      ((self 'lt) ((self 'len) match) n))))
+(define (yaml-parser-parse!/s-indent-lt self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-indent-lt",n))
+  (may   (all     (rep 0 #f yaml-parser-parse!/s-space)
+        (lt (len match) n))))
 
 
 
@@ -766,10 +964,13 @@
 ; s-indent(<=n) ::=
 ;   s-space{m} <where_m_<=_n>
 
-(define (s_indent_le self n)
-  (when +debug+ (debug-rule "s_indent_le",n))
-  ((self 'may)   ((self 'all)   ((self 'rep) 0 #f s_space)
-      ((self 'le) ((self 'len) match) n))))
+(define (yaml-parser-parse!/s-indent-le self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-indent-le",n))
+  (may   (all     (rep 0 #f yaml-parser-parse!/s-space)
+        (le (len match) n))))
 
 
 
@@ -777,10 +978,13 @@
 ; s-separate-in-line ::=
 ;   s-white+ | <start_of_line>
 
-(define (s_separate_in_line self)
-  (when +debug+ (debug-rule "s_separate_in_line"))
-  ((self 'any)   ((self 'rep) 1 #f s_white)
-    start_of_line))
+(define (yaml-parser-parse!/s-separate-in-line self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-separate-in-line"))
+  (any     (rep 1 #f yaml-parser-parse!/s-white)
+      yaml-parser-parse!/start-of-line))
 
 
 
@@ -791,15 +995,18 @@
 ;   ( c = flow-out => s-flow-line-prefix(n) )
 ;   ( c = flow-in => s-flow-line-prefix(n) )
 
-(define (s_line_prefix self n c)
-  (when +debug+ (debug-rule "s_line_prefix",nc))
-  ((self 'case)   c
-    {
-      'block-in' => [ s_block_line_prefix, n ],
-      'block-out' => [ s_block_line_prefix, n ],
-      'flow-in' => [ s_flow_line_prefix, n ],
-      'flow-out' => [ s_flow_line_prefix, n ],
-    }))
+(define (yaml-parser-parse!/s-line-prefix self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-line-prefix",nc))
+  (parse-case   c
+    '(
+      (block-in . (yaml-parser-parse!/s-block-line-prefix n))
+      (block-out . (yaml-parser-parse!/s-block-line-prefix n))
+      (flow-in . (yaml-parser-parse!/s-flow-line-prefix n))
+      (flow-out . (yaml-parser-parse!/s-flow-line-prefix n))
+    )))
 
 
 
@@ -807,9 +1014,12 @@
 ; s-block-line-prefix(n) ::=
 ;   s-indent(n)
 
-(define (s_block_line_prefix self n)
-  (when +debug+ (debug-rule "s_block_line_prefix",n))
-  [ s_indent, n ])
+(define (yaml-parser-parse!/s-block-line-prefix self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-block-line-prefix",n))
+  (yaml-parser-parse!/s-indent n))
 
 
 
@@ -818,10 +1028,13 @@
 ;   s-indent(n)
 ;   s-separate-in-line?
 
-(define (s_flow_line_prefix self n)
-  (when +debug+ (debug-rule "s_flow_line_prefix",n))
-  ((self 'all)   [ s_indent, n ]
-    ((self 'rep) 0 1 s_separate_in_line)))
+(define (yaml-parser-parse!/s-flow-line-prefix self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-flow-line-prefix",n))
+  (all     (yaml-parser-parse!/s-indent n)
+      (rep 0 1 yaml-parser-parse!/s-separate-in-line)))
 
 
 
@@ -830,11 +1043,14 @@
 ;   ( s-line-prefix(n,c) | s-indent(<n) )
 ;   b-as-line-feed
 
-(define (l_empty self n c)
-  (when +debug+ (debug-rule "l_empty",nc))
-  ((self 'all)   ((self 'any)   [ s_line_prefix, n, c ]
-      [ s_indent_lt, n ])
-    b_as_line_feed))
+(define (yaml-parser-parse!/l-empty self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-empty",nc))
+  (all     (any     (yaml-parser-parse!/s-line-prefix n c)
+          (yaml-parser-parse!/s-indent-lt n))
+      yaml-parser-parse!/b-as-line-feed))
 
 
 
@@ -842,10 +1058,13 @@
 ; b-l-trimmed(n,c) ::=
 ;   b-non-content l-empty(n,c)+
 
-(define (b_l_trimmed self n c)
-  (when +debug+ (debug-rule "b_l_trimmed",nc))
-  ((self 'all)   b_non_content
-    ((self 'rep) 1 #f [ l_empty, n, c ])))
+(define (yaml-parser-parse!/b-l-trimmed self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-l-trimmed",nc))
+  (all     yaml-parser-parse!/b-non-content
+      (rep 1 #f (yaml-parser-parse!/l-empty n c))))
 
 
 
@@ -853,9 +1072,12 @@
 ; b-as-space ::=
 ;   b-break
 
-(define (b_as_space self)
-  (when +debug+ (debug-rule "b_as_space"))
-  b_break)
+(define (yaml-parser-parse!/b-as-space self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-as-space"))
+  yaml-parser-parse!/b-break)
 
 
 
@@ -863,10 +1085,13 @@
 ; b-l-folded(n,c) ::=
 ;   b-l-trimmed(n,c) | b-as-space
 
-(define (b_l_folded self n c)
-  (when +debug+ (debug-rule "b_l_folded",nc))
-  ((self 'any)   [ b_l_trimmed, n, c ]
-    b_as_space))
+(define (yaml-parser-parse!/b-l-folded self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-l-folded",nc))
+  (any     (yaml-parser-parse!/b-l-trimmed n c)
+      yaml-parser-parse!/b-as-space))
 
 
 
@@ -876,11 +1101,14 @@
 ;   b-l-folded(n,flow-in)
 ;   s-flow-line-prefix(n)
 
-(define (s_flow_folded self n)
-  (when +debug+ (debug-rule "s_flow_folded",n))
-  ((self 'all)   ((self 'rep) 0 1 s_separate_in_line)
-    [ b_l_folded, n, "flow-in" ]
-    [ s_flow_line_prefix, n ]))
+(define (yaml-parser-parse!/s-flow-folded self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-flow-folded",n))
+  (all     (rep 0 1 yaml-parser-parse!/s-separate-in-line)
+      (yaml-parser-parse!/b-l-folded n "flow-in")
+      (yaml-parser-parse!/s-flow-line-prefix n)))
 
 
 
@@ -888,10 +1116,13 @@
 ; c-nb-comment-text ::=
 ;   '#' nb-char*
 
-(define (c_nb_comment_text self)
-  (when +debug+ (debug-rule "c_nb_comment_text"))
-  ((self 'all)   ((self 'chr) '#')
-    ((self 'rep) 0 #f nb_char)))
+(define (yaml-parser-parse!/c-nb-comment-text self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-nb-comment-text"))
+  (all     (chr #\#)
+      (rep 0 #f yaml-parser-parse!/nb-char)))
 
 
 
@@ -899,10 +1130,13 @@
 ; b-comment ::=
 ;   b-non-content | <end_of_file>
 
-(define (b_comment self)
-  (when +debug+ (debug-rule "b_comment"))
-  ((self 'any)   b_non_content
-    end_of_stream))
+(define (yaml-parser-parse!/b-comment self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-comment"))
+  (any     yaml-parser-parse!/b-non-content
+      yaml-parser-parse!/end-of-stream))
 
 
 
@@ -912,13 +1146,16 @@
 ;   c-nb-comment-text? )?
 ;   b-comment
 
-(define (s_b_comment self)
-  (when +debug+ (debug-rule "s_b_comment"))
-  ((self 'all)   ((self 'rep)   0
-      1
-      ((self 'all)   s_separate_in_line
-        ((self 'rep) 0 1 c_nb_comment_text)))
-    b_comment))
+(define (yaml-parser-parse!/s-b-comment self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-b-comment"))
+  (all     (rep   0
+        1
+        (all     yaml-parser-parse!/s-separate-in-line
+            (rep 0 1 yaml-parser-parse!/c-nb-comment-text)))
+      yaml-parser-parse!/b-comment))
 
 
 
@@ -927,11 +1164,14 @@
 ;   s-separate-in-line c-nb-comment-text?
 ;   b-comment
 
-(define (l_comment self)
-  (when +debug+ (debug-rule "l_comment"))
-  ((self 'all)   s_separate_in_line
-    ((self 'rep) 0 1 c_nb_comment_text)
-    b_comment))
+(define (yaml-parser-parse!/l-comment self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-comment"))
+  (all     yaml-parser-parse!/s-separate-in-line
+      (rep 0 1 yaml-parser-parse!/c-nb-comment-text)
+      yaml-parser-parse!/b-comment))
 
 
 
@@ -940,11 +1180,14 @@
 ;   ( s-b-comment | <start_of_line> )
 ;   l-comment*
 
-(define (s_l_comments self)
-  (when +debug+ (debug-rule "s_l_comments"))
-  ((self 'all)   ((self 'any)   s_b_comment
-      start_of_line)
-    ((self 'rep) 0 #f l_comment)))
+(define (yaml-parser-parse!/s-l-comments self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-l-comments"))
+  (all     (any     yaml-parser-parse!/s-b-comment
+          yaml-parser-parse!/start-of-line)
+      (rep 0 #f yaml-parser-parse!/l-comment)))
 
 
 
@@ -957,17 +1200,20 @@
 ;   ( c = block-key => s-separate-in-line )
 ;   ( c = flow-key => s-separate-in-line )
 
-(define (s_separate self n c)
-  (when +debug+ (debug-rule "s_separate",nc))
-  ((self 'case)   c
-    {
-      'block-in' => [ s_separate_lines, n ],
-      'block-key' => s_separate_in_line,
-      'block-out' => [ s_separate_lines, n ],
-      'flow-in' => [ s_separate_lines, n ],
-      'flow-key' => s_separate_in_line,
-      'flow-out' => [ s_separate_lines, n ],
-    }))
+(define (yaml-parser-parse!/s-separate self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-separate",nc))
+  (parse-case   c
+    '(
+      (block-in . (yaml-parser-parse!/s-separate-lines n))
+      (block-key . yaml-parser-parse!/s-separate-in-line)
+      (block-out . (yaml-parser-parse!/s-separate-lines n))
+      (flow-in . (yaml-parser-parse!/s-separate-lines n))
+      (flow-key . yaml-parser-parse!/s-separate-in-line)
+      (flow-out . (yaml-parser-parse!/s-separate-lines n))
+    )))
 
 
 
@@ -977,11 +1223,14 @@
 ;   s-flow-line-prefix(n) )
 ;   | s-separate-in-line
 
-(define (s_separate_lines self n)
-  (when +debug+ (debug-rule "s_separate_lines",n))
-  ((self 'any)   ((self 'all)   s_l_comments
-      [ s_flow_line_prefix, n ])
-    s_separate_in_line))
+(define (yaml-parser-parse!/s-separate-lines self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-separate-lines",n))
+  (any     (all     yaml-parser-parse!/s-l-comments
+          (yaml-parser-parse!/s-flow-line-prefix n))
+      yaml-parser-parse!/s-separate-in-line))
 
 
 
@@ -993,13 +1242,16 @@
 ;   | ns-reserved-directive )
 ;   s-l-comments
 
-(define (l_directive self)
-  (when +debug+ (debug-rule "l_directive"))
-  ((self 'all)   ((self 'chr) '%')
-    ((self 'any)   ns_yaml_directive
-      ns_tag_directive
-      ns_reserved_directive)
-    s_l_comments))
+(define (yaml-parser-parse!/l-directive self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-directive"))
+  (all     (chr #\%)
+      (any     yaml-parser-parse!/ns-yaml-directive
+          yaml-parser-parse!/ns-tag-directive
+          yaml-parser-parse!/ns-reserved-directive)
+      yaml-parser-parse!/s-l-comments))
 
 
 
@@ -1008,13 +1260,16 @@
 ;   ns-directive-name
 ;   ( s-separate-in-line ns-directive-parameter )*
 
-(define (ns_reserved_directive self)
-  (when +debug+ (debug-rule "ns_reserved_directive"))
-  ((self 'all)   ns_directive_name
-    ((self 'rep)   0
-      #f
-      ((self 'all)   s_separate_in_line
-        ns_directive_parameter))))
+(define (yaml-parser-parse!/ns-reserved-directive self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-reserved-directive"))
+  (all     yaml-parser-parse!/ns-directive-name
+      (rep   0
+        #f
+        (all     yaml-parser-parse!/s-separate-in-line
+            yaml-parser-parse!/ns-directive-parameter))))
 
 
 
@@ -1022,9 +1277,12 @@
 ; ns-directive-name ::=
 ;   ns-char+
 
-(define (ns_directive_name self)
-  (when +debug+ (debug-rule "ns_directive_name"))
-  ((self 'rep) 1 #f ns_char))
+(define (yaml-parser-parse!/ns-directive-name self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-directive-name"))
+  (rep 1 #f yaml-parser-parse!/ns-char))
 
 
 
@@ -1032,9 +1290,12 @@
 ; ns-directive-parameter ::=
 ;   ns-char+
 
-(define (ns_directive_parameter self)
-  (when +debug+ (debug-rule "ns_directive_parameter"))
-  ((self 'rep) 1 #f ns_char))
+(define (yaml-parser-parse!/ns-directive-parameter self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-directive-parameter"))
+  (rep 1 #f yaml-parser-parse!/ns-char))
 
 
 
@@ -1043,14 +1304,17 @@
 ;   'Y' 'A' 'M' 'L'
 ;   s-separate-in-line ns-yaml-version
 
-(define (ns_yaml_directive self)
-  (when +debug+ (debug-rule "ns_yaml_directive"))
-  ((self 'all)   ((self 'chr) 'Y')
-    ((self 'chr) 'A')
-    ((self 'chr) 'M')
-    ((self 'chr) 'L')
-    s_separate_in_line
-    ns_yaml_version))
+(define (yaml-parser-parse!/ns-yaml-directive self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-yaml-directive"))
+  (all     (chr #\Y)
+      (chr #\A)
+      (chr #\M)
+      (chr #\L)
+      yaml-parser-parse!/s-separate-in-line
+      yaml-parser-parse!/ns-yaml-version))
 
 
 
@@ -1058,11 +1322,14 @@
 ; ns-yaml-version ::=
 ;   ns-dec-digit+ '.' ns-dec-digit+
 
-(define (ns_yaml_version self)
-  (when +debug+ (debug-rule "ns_yaml_version"))
-  ((self 'all)   ((self 'rep) 1 #f ns_dec_digit)
-    ((self 'chr) '.')
-    ((self 'rep) 1 #f ns_dec_digit)))
+(define (yaml-parser-parse!/ns-yaml-version self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-yaml-version"))
+  (all     (rep 1 #f yaml-parser-parse!/ns-dec-digit)
+      (chr #\.)
+      (rep 1 #f yaml-parser-parse!/ns-dec-digit)))
 
 
 
@@ -1072,15 +1339,18 @@
 ;   s-separate-in-line c-tag-handle
 ;   s-separate-in-line ns-tag-prefix
 
-(define (ns_tag_directive self)
-  (when +debug+ (debug-rule "ns_tag_directive"))
-  ((self 'all)   ((self 'chr) 'T')
-    ((self 'chr) 'A')
-    ((self 'chr) 'G')
-    s_separate_in_line
-    c_tag_handle
-    s_separate_in_line
-    ns_tag_prefix))
+(define (yaml-parser-parse!/ns-tag-directive self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-tag-directive"))
+  (all     (chr #\T)
+      (chr #\A)
+      (chr #\G)
+      yaml-parser-parse!/s-separate-in-line
+      yaml-parser-parse!/c-tag-handle
+      yaml-parser-parse!/s-separate-in-line
+      yaml-parser-parse!/ns-tag-prefix))
 
 
 
@@ -1090,11 +1360,14 @@
 ;   | c-secondary-tag-handle
 ;   | c-primary-tag-handle
 
-(define (c_tag_handle self)
-  (when +debug+ (debug-rule "c_tag_handle"))
-  ((self 'any)   c_named_tag_handle
-    c_secondary_tag_handle
-    c_primary_tag_handle))
+(define (yaml-parser-parse!/c-tag-handle self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-tag-handle"))
+  (any     yaml-parser-parse!/c-named-tag-handle
+      yaml-parser-parse!/c-secondary-tag-handle
+      yaml-parser-parse!/c-primary-tag-handle))
 
 
 
@@ -1102,9 +1375,12 @@
 ; c-primary-tag-handle ::=
 ;   '!'
 
-(define (c_primary_tag_handle self)
-  (when +debug+ (debug-rule "c_primary_tag_handle"))
-  ((self 'chr) '!'))
+(define (yaml-parser-parse!/c-primary-tag-handle self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-primary-tag-handle"))
+  (chr #\!))
 
 
 
@@ -1112,10 +1388,13 @@
 ; c-secondary-tag-handle ::=
 ;   '!' '!'
 
-(define (c_secondary_tag_handle self)
-  (when +debug+ (debug-rule "c_secondary_tag_handle"))
-  ((self 'all)   ((self 'chr) '!')
-    ((self 'chr) '!')))
+(define (yaml-parser-parse!/c-secondary-tag-handle self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-secondary-tag-handle"))
+  (all     (chr #\!)
+      (chr #\!)))
 
 
 
@@ -1123,11 +1402,14 @@
 ; c-named-tag-handle ::=
 ;   '!' ns-word-char+ '!'
 
-(define (c_named_tag_handle self)
-  (when +debug+ (debug-rule "c_named_tag_handle"))
-  ((self 'all)   ((self 'chr) '!')
-    ((self 'rep) 1 #f ns_word_char)
-    ((self 'chr) '!')))
+(define (yaml-parser-parse!/c-named-tag-handle self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-named-tag-handle"))
+  (all     (chr #\!)
+      (rep 1 #f yaml-parser-parse!/ns-word-char)
+      (chr #\!)))
 
 
 
@@ -1135,10 +1417,13 @@
 ; ns-tag-prefix ::=
 ;   c-ns-local-tag-prefix | ns-global-tag-prefix
 
-(define (ns_tag_prefix self)
-  (when +debug+ (debug-rule "ns_tag_prefix"))
-  ((self 'any)   c_ns_local_tag_prefix
-    ns_global_tag_prefix))
+(define (yaml-parser-parse!/ns-tag-prefix self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-tag-prefix"))
+  (any     yaml-parser-parse!/c-ns-local-tag-prefix
+      yaml-parser-parse!/ns-global-tag-prefix))
 
 
 
@@ -1146,10 +1431,13 @@
 ; c-ns-local-tag-prefix ::=
 ;   '!' ns-uri-char*
 
-(define (c_ns_local_tag_prefix self)
-  (when +debug+ (debug-rule "c_ns_local_tag_prefix"))
-  ((self 'all)   ((self 'chr) '!')
-    ((self 'rep) 0 #f ns_uri_char)))
+(define (yaml-parser-parse!/c-ns-local-tag-prefix self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-local-tag-prefix"))
+  (all     (chr #\!)
+      (rep 0 #f yaml-parser-parse!/ns-uri-char)))
 
 
 
@@ -1157,10 +1445,13 @@
 ; ns-global-tag-prefix ::=
 ;   ns-tag-char ns-uri-char*
 
-(define (ns_global_tag_prefix self)
-  (when +debug+ (debug-rule "ns_global_tag_prefix"))
-  ((self 'all)   ns_tag_char
-    ((self 'rep) 0 #f ns_uri_char)))
+(define (yaml-parser-parse!/ns-global-tag-prefix self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-global-tag-prefix"))
+  (all     yaml-parser-parse!/ns-tag-char
+      (rep 0 #f yaml-parser-parse!/ns-uri-char)))
 
 
 
@@ -1171,18 +1462,21 @@
 ;   | ( c-ns-anchor-property
 ;   ( s-separate(n,c) c-ns-tag-property )? )
 
-(define (c_ns_properties self n c)
-  (when +debug+ (debug-rule "c_ns_properties",nc))
-  ((self 'any)   ((self 'all)   c_ns_tag_property
-      ((self 'rep)   0
-        1
-        ((self 'all)   [ s_separate, n, c ]
-          c_ns_anchor_property)))
-    ((self 'all)   c_ns_anchor_property
-      ((self 'rep)   0
-        1
-        ((self 'all)   [ s_separate, n, c ]
-          c_ns_tag_property)))))
+(define (yaml-parser-parse!/c-ns-properties self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-properties",nc))
+  (any     (all     yaml-parser-parse!/c-ns-tag-property
+          (rep   0
+            1
+            (all     (yaml-parser-parse!/s-separate n c)
+                yaml-parser-parse!/c-ns-anchor-property)))
+      (all     yaml-parser-parse!/c-ns-anchor-property
+          (rep   0
+            1
+            (all     (yaml-parser-parse!/s-separate n c)
+                yaml-parser-parse!/c-ns-tag-property)))))
 
 
 
@@ -1192,11 +1486,14 @@
 ;   | c-ns-shorthand-tag
 ;   | c-non-specific-tag
 
-(define (c_ns_tag_property self)
-  (when +debug+ (debug-rule "c_ns_tag_property"))
-  ((self 'any)   c_verbatim_tag
-    c_ns_shorthand_tag
-    c_non_specific_tag))
+(define (yaml-parser-parse!/c-ns-tag-property self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-tag-property"))
+  (any     yaml-parser-parse!/c-verbatim-tag
+      yaml-parser-parse!/c-ns-shorthand-tag
+      yaml-parser-parse!/c-non-specific-tag))
 
 
 
@@ -1204,12 +1501,15 @@
 ; c-verbatim-tag ::=
 ;   '!' '<' ns-uri-char+ '>'
 
-(define (c_verbatim_tag self)
-  (when +debug+ (debug-rule "c_verbatim_tag"))
-  ((self 'all)   ((self 'chr) '!')
-    ((self 'chr) '<')
-    ((self 'rep) 1 #f ns_uri_char)
-    ((self 'chr) '>')))
+(define (yaml-parser-parse!/c-verbatim-tag self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-verbatim-tag"))
+  (all     (chr #\!)
+      (chr #\<)
+      (rep 1 #f yaml-parser-parse!/ns-uri-char)
+      (chr #\>)))
 
 
 
@@ -1217,10 +1517,13 @@
 ; c-ns-shorthand-tag ::=
 ;   c-tag-handle ns-tag-char+
 
-(define (c_ns_shorthand_tag self)
-  (when +debug+ (debug-rule "c_ns_shorthand_tag"))
-  ((self 'all)   c_tag_handle
-    ((self 'rep) 1 #f ns_tag_char)))
+(define (yaml-parser-parse!/c-ns-shorthand-tag self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-shorthand-tag"))
+  (all     yaml-parser-parse!/c-tag-handle
+      (rep 1 #f yaml-parser-parse!/ns-tag-char)))
 
 
 
@@ -1228,9 +1531,12 @@
 ; c-non-specific-tag ::=
 ;   '!'
 
-(define (c_non_specific_tag self)
-  (when +debug+ (debug-rule "c_non_specific_tag"))
-  ((self 'chr) '!'))
+(define (yaml-parser-parse!/c-non-specific-tag self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-non-specific-tag"))
+  (chr #\!))
 
 
 
@@ -1238,10 +1544,13 @@
 ; c-ns-anchor-property ::=
 ;   '&' ns-anchor-name
 
-(define (c_ns_anchor_property self)
-  (when +debug+ (debug-rule "c_ns_anchor_property"))
-  ((self 'all)   ((self 'chr) '&')
-    ns_anchor_name))
+(define (yaml-parser-parse!/c-ns-anchor-property self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-anchor-property"))
+  (all     (chr #\&)
+      yaml-parser-parse!/ns-anchor-name))
 
 
 
@@ -1249,10 +1558,13 @@
 ; ns-anchor-char ::=
 ;   ns-char - c-flow-indicator
 
-(define (ns_anchor_char self)
-  (when +debug+ (debug-rule "ns_anchor_char"))
-  ((self 'but)   ns_char
-    c_flow_indicator))
+(define (yaml-parser-parse!/ns-anchor-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-anchor-char"))
+  (but     yaml-parser-parse!/ns-char
+      yaml-parser-parse!/c-flow-indicator))
 
 
 
@@ -1260,9 +1572,12 @@
 ; ns-anchor-name ::=
 ;   ns-anchor-char+
 
-(define (ns_anchor_name self)
-  (when +debug+ (debug-rule "ns_anchor_name"))
-  ((self 'rep) 1 #f ns_anchor_char))
+(define (yaml-parser-parse!/ns-anchor-name self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-anchor-name"))
+  (rep 1 #f yaml-parser-parse!/ns-anchor-char))
 
 
 
@@ -1270,10 +1585,13 @@
 ; c-ns-alias-node ::=
 ;   '*' ns-anchor-name
 
-(define (c_ns_alias_node self)
-  (when +debug+ (debug-rule "c_ns_alias_node"))
-  ((self 'all)   ((self 'chr) '*')
-    ns_anchor_name))
+(define (yaml-parser-parse!/c-ns-alias-node self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-alias-node"))
+  (all     (chr #\*)
+      yaml-parser-parse!/ns-anchor-name))
 
 
 
@@ -1281,9 +1599,12 @@
 ; e-scalar ::=
 ;   <empty>
 
-(define (e_scalar self)
-  (when +debug+ (debug-rule "e_scalar"))
-  empty)
+(define (yaml-parser-parse!/e-scalar self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/e-scalar"))
+  yaml-parser-parse!/empty)
 
 
 
@@ -1291,9 +1612,12 @@
 ; e-node ::=
 ;   e-scalar
 
-(define (e_node self)
-  (when +debug+ (debug-rule "e_node"))
-  e_scalar)
+(define (yaml-parser-parse!/e-node self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/e-node"))
+  yaml-parser-parse!/e-scalar)
 
 
 
@@ -1301,12 +1625,15 @@
 ; nb-double-char ::=
 ;   c-ns-esc-char | ( nb-json - '\' - '"' )
 
-(define (nb_double_char self)
-  (when +debug+ (debug-rule "nb_double_char"))
-  ((self 'any)   c_ns_esc_char
-    ((self 'but)   nb_json
-      ((self 'chr) "\\")
-      ((self 'chr) '"'))))
+(define (yaml-parser-parse!/nb-double-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-double-char"))
+  (any     yaml-parser-parse!/c-ns-esc-char
+      (but     yaml-parser-parse!/nb-json
+          (chr #\\)
+          (chr #\"))))
 
 
 
@@ -1314,10 +1641,13 @@
 ; ns-double-char ::=
 ;   nb-double-char - s-white
 
-(define (ns_double_char self)
-  (when +debug+ (debug-rule "ns_double_char"))
-  ((self 'but)   nb_double_char
-    s_white))
+(define (yaml-parser-parse!/ns-double-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-double-char"))
+  (but     yaml-parser-parse!/nb-double-char
+      yaml-parser-parse!/s-white))
 
 
 
@@ -1326,11 +1656,14 @@
 ;   '"' nb-double-text(n,c)
 ;   '"'
 
-(define (c_double_quoted self n c)
-  (when +debug+ (debug-rule "c_double_quoted",nc))
-  ((self 'all)   ((self 'chr) '"')
-    [ nb_double_text, n, c ]
-    ((self 'chr) '"')))
+(define (yaml-parser-parse!/c-double-quoted self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-double-quoted",nc))
+  (all     (chr #\")
+      (yaml-parser-parse!/nb-double-text n c)
+      (chr #\")))
 
 
 
@@ -1341,15 +1674,18 @@
 ;   ( c = block-key => nb-double-one-line )
 ;   ( c = flow-key => nb-double-one-line )
 
-(define (nb_double_text self n c)
-  (when +debug+ (debug-rule "nb_double_text",nc))
-  ((self 'case)   c
-    {
-      'block-key' => nb_double_one_line,
-      'flow-in' => [ nb_double_multi_line, n ],
-      'flow-key' => nb_double_one_line,
-      'flow-out' => [ nb_double_multi_line, n ],
-    }))
+(define (yaml-parser-parse!/nb-double-text self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-double-text",nc))
+  (parse-case   c
+    '(
+      (block-key . yaml-parser-parse!/nb-double-one-line)
+      (flow-in . (yaml-parser-parse!/nb-double-multi-line n))
+      (flow-key . yaml-parser-parse!/nb-double-one-line)
+      (flow-out . (yaml-parser-parse!/nb-double-multi-line n))
+    )))
 
 
 
@@ -1357,9 +1693,12 @@
 ; nb-double-one-line ::=
 ;   nb-double-char*
 
-(define (nb_double_one_line self)
-  (when +debug+ (debug-rule "nb_double_one_line"))
-  ((self 'rep) 0 #f nb_double_char))
+(define (yaml-parser-parse!/nb-double-one-line self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-double-one-line"))
+  (rep 0 #f yaml-parser-parse!/nb-double-char))
 
 
 
@@ -1369,13 +1708,16 @@
 ;   b-non-content
 ;   l-empty(n,flow-in)* s-flow-line-prefix(n)
 
-(define (s_double_escaped self n)
-  (when +debug+ (debug-rule "s_double_escaped",n))
-  ((self 'all)   ((self 'rep) 0 #f s_white)
-    ((self 'chr) "\\")
-    b_non_content
-    ((self 'rep) 0 #f [ l_empty, n, "flow-in" ])
-    [ s_flow_line_prefix, n ]))
+(define (yaml-parser-parse!/s-double-escaped self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-double-escaped",n))
+  (all     (rep 0 #f yaml-parser-parse!/s-white)
+      (chr #\\)
+      yaml-parser-parse!/b-non-content
+      (rep 0 #f (yaml-parser-parse!/l-empty n "flow-in"))
+      (yaml-parser-parse!/s-flow-line-prefix n)))
 
 
 
@@ -1383,10 +1725,13 @@
 ; s-double-break(n) ::=
 ;   s-double-escaped(n) | s-flow-folded(n)
 
-(define (s_double_break self n)
-  (when +debug+ (debug-rule "s_double_break",n))
-  ((self 'any)   [ s_double_escaped, n ]
-    [ s_flow_folded, n ]))
+(define (yaml-parser-parse!/s-double-break self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-double-break",n))
+  (any     (yaml-parser-parse!/s-double-escaped n)
+      (yaml-parser-parse!/s-flow-folded n)))
 
 
 
@@ -1394,12 +1739,15 @@
 ; nb-ns-double-in-line ::=
 ;   ( s-white* ns-double-char )*
 
-(define (nb_ns_double_in_line self)
-  (when +debug+ (debug-rule "nb_ns_double_in_line"))
-  ((self 'rep)   0
+(define (yaml-parser-parse!/nb-ns-double-in-line self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-ns-double-in-line"))
+  (rep   0
     #f
-    ((self 'all)   ((self 'rep) 0 #f s_white)
-      ns_double_char)))
+    (all     (rep 0 #f yaml-parser-parse!/s-white)
+        yaml-parser-parse!/ns-double-char)))
 
 
 
@@ -1409,15 +1757,18 @@
 ;   ( ns-double-char nb-ns-double-in-line
 ;   ( s-double-next-line(n) | s-white* ) )?
 
-(define (s_double_next_line self n)
-  (when +debug+ (debug-rule "s_double_next_line",n))
-  ((self 'all)   [ s_double_break, n ]
-    ((self 'rep)   0
-      1
-      ((self 'all)   ns_double_char
-        nb_ns_double_in_line
-        ((self 'any)   [ s_double_next_line, n ]
-          ((self 'rep) 0 #f s_white))))))
+(define (yaml-parser-parse!/s-double-next-line self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-double-next-line",n))
+  (all     (yaml-parser-parse!/s-double-break n)
+      (rep   0
+        1
+        (all     yaml-parser-parse!/ns-double-char
+            yaml-parser-parse!/nb-ns-double-in-line
+            (any     (yaml-parser-parse!/s-double-next-line n)
+                (rep 0 #f yaml-parser-parse!/s-white))))))
 
 
 
@@ -1426,11 +1777,14 @@
 ;   nb-ns-double-in-line
 ;   ( s-double-next-line(n) | s-white* )
 
-(define (nb_double_multi_line self n)
-  (when +debug+ (debug-rule "nb_double_multi_line",n))
-  ((self 'all)   nb_ns_double_in_line
-    ((self 'any)   [ s_double_next_line, n ]
-      ((self 'rep) 0 #f s_white))))
+(define (yaml-parser-parse!/nb-double-multi-line self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-double-multi-line",n))
+  (all     yaml-parser-parse!/nb-ns-double-in-line
+      (any     (yaml-parser-parse!/s-double-next-line n)
+          (rep 0 #f yaml-parser-parse!/s-white))))
 
 
 
@@ -1438,10 +1792,13 @@
 ; c-quoted-quote ::=
 ;   ''' '''
 
-(define (c_quoted_quote self)
-  (when +debug+ (debug-rule "c_quoted_quote"))
-  ((self 'all)   ((self 'chr) "'")
-    ((self 'chr) "'")))
+(define (yaml-parser-parse!/c-quoted-quote self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-quoted-quote"))
+  (all     (chr #\')
+      (chr #\')))
 
 
 
@@ -1449,11 +1806,14 @@
 ; nb-single-char ::=
 ;   c-quoted-quote | ( nb-json - ''' )
 
-(define (nb_single_char self)
-  (when +debug+ (debug-rule "nb_single_char"))
-  ((self 'any)   c_quoted_quote
-    ((self 'but)   nb_json
-      ((self 'chr) "'"))))
+(define (yaml-parser-parse!/nb-single-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-single-char"))
+  (any     yaml-parser-parse!/c-quoted-quote
+      (but     yaml-parser-parse!/nb-json
+          (chr #\'))))
 
 
 
@@ -1461,10 +1821,13 @@
 ; ns-single-char ::=
 ;   nb-single-char - s-white
 
-(define (ns_single_char self)
-  (when +debug+ (debug-rule "ns_single_char"))
-  ((self 'but)   nb_single_char
-    s_white))
+(define (yaml-parser-parse!/ns-single-char self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-single-char"))
+  (but     yaml-parser-parse!/nb-single-char
+      yaml-parser-parse!/s-white))
 
 
 
@@ -1473,11 +1836,14 @@
 ;   ''' nb-single-text(n,c)
 ;   '''
 
-(define (c_single_quoted self n c)
-  (when +debug+ (debug-rule "c_single_quoted",nc))
-  ((self 'all)   ((self 'chr) "'")
-    [ nb_single_text, n, c ]
-    ((self 'chr) "'")))
+(define (yaml-parser-parse!/c-single-quoted self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-single-quoted",nc))
+  (all     (chr #\')
+      (yaml-parser-parse!/nb-single-text n c)
+      (chr #\')))
 
 
 
@@ -1488,15 +1854,18 @@
 ;   ( c = block-key => nb-single-one-line )
 ;   ( c = flow-key => nb-single-one-line )
 
-(define (nb_single_text self n c)
-  (when +debug+ (debug-rule "nb_single_text",nc))
-  ((self 'case)   c
-    {
-      'block-key' => nb_single_one_line,
-      'flow-in' => [ nb_single_multi_line, n ],
-      'flow-key' => nb_single_one_line,
-      'flow-out' => [ nb_single_multi_line, n ],
-    }))
+(define (yaml-parser-parse!/nb-single-text self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-single-text",nc))
+  (parse-case   c
+    '(
+      (block-key . yaml-parser-parse!/nb-single-one-line)
+      (flow-in . (yaml-parser-parse!/nb-single-multi-line n))
+      (flow-key . yaml-parser-parse!/nb-single-one-line)
+      (flow-out . (yaml-parser-parse!/nb-single-multi-line n))
+    )))
 
 
 
@@ -1504,9 +1873,12 @@
 ; nb-single-one-line ::=
 ;   nb-single-char*
 
-(define (nb_single_one_line self)
-  (when +debug+ (debug-rule "nb_single_one_line"))
-  ((self 'rep) 0 #f nb_single_char))
+(define (yaml-parser-parse!/nb-single-one-line self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-single-one-line"))
+  (rep 0 #f yaml-parser-parse!/nb-single-char))
 
 
 
@@ -1514,12 +1886,15 @@
 ; nb-ns-single-in-line ::=
 ;   ( s-white* ns-single-char )*
 
-(define (nb_ns_single_in_line self)
-  (when +debug+ (debug-rule "nb_ns_single_in_line"))
-  ((self 'rep)   0
+(define (yaml-parser-parse!/nb-ns-single-in-line self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-ns-single-in-line"))
+  (rep   0
     #f
-    ((self 'all)   ((self 'rep) 0 #f s_white)
-      ns_single_char)))
+    (all     (rep 0 #f yaml-parser-parse!/s-white)
+        yaml-parser-parse!/ns-single-char)))
 
 
 
@@ -1529,15 +1904,18 @@
 ;   ( ns-single-char nb-ns-single-in-line
 ;   ( s-single-next-line(n) | s-white* ) )?
 
-(define (s_single_next_line self n)
-  (when +debug+ (debug-rule "s_single_next_line",n))
-  ((self 'all)   [ s_flow_folded, n ]
-    ((self 'rep)   0
-      1
-      ((self 'all)   ns_single_char
-        nb_ns_single_in_line
-        ((self 'any)   [ s_single_next_line, n ]
-          ((self 'rep) 0 #f s_white))))))
+(define (yaml-parser-parse!/s-single-next-line self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-single-next-line",n))
+  (all     (yaml-parser-parse!/s-flow-folded n)
+      (rep   0
+        1
+        (all     yaml-parser-parse!/ns-single-char
+            yaml-parser-parse!/nb-ns-single-in-line
+            (any     (yaml-parser-parse!/s-single-next-line n)
+                (rep 0 #f yaml-parser-parse!/s-white))))))
 
 
 
@@ -1546,11 +1924,14 @@
 ;   nb-ns-single-in-line
 ;   ( s-single-next-line(n) | s-white* )
 
-(define (nb_single_multi_line self n)
-  (when +debug+ (debug-rule "nb_single_multi_line",n))
-  ((self 'all)   nb_ns_single_in_line
-    ((self 'any)   [ s_single_next_line, n ]
-      ((self 'rep) 0 #f s_white))))
+(define (yaml-parser-parse!/nb-single-multi-line self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-single-multi-line",n))
+  (all     yaml-parser-parse!/nb-ns-single-in-line
+      (any     (yaml-parser-parse!/s-single-next-line n)
+          (rep 0 #f yaml-parser-parse!/s-white))))
 
 
 
@@ -1560,14 +1941,17 @@
 ;   | ( ( '?' | ':' | '-' )
 ;   <followed_by_an_ns-plain-safe(c)> )
 
-(define (ns_plain_first self c)
-  (when +debug+ (debug-rule "ns_plain_first",c))
-  ((self 'any)   ((self 'but)   ns_char
-      c_indicator)
-    ((self 'all)   ((self 'any)   ((self 'chr) '?')
-        ((self 'chr) ':')
-        ((self 'chr) '-'))
-      ((self 'chk) '=' [ ns_plain_safe, c ]))))
+(define (yaml-parser-parse!/ns-plain-first self c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-plain-first",c))
+  (any     (but     yaml-parser-parse!/ns-char
+          yaml-parser-parse!/c-indicator)
+      (all     (any     (chr #\?)
+              (chr #\:)
+              (chr #\-))
+          (chk '=' (yaml-parser-parse!/ns-plain-safe c)))))
 
 
 
@@ -1578,15 +1962,18 @@
 ;   ( c = block-key => ns-plain-safe-out )
 ;   ( c = flow-key => ns-plain-safe-in )
 
-(define (ns_plain_safe self c)
-  (when +debug+ (debug-rule "ns_plain_safe",c))
-  ((self 'case)   c
-    {
-      'block-key' => ns_plain_safe_out,
-      'flow-in' => ns_plain_safe_in,
-      'flow-key' => ns_plain_safe_in,
-      'flow-out' => ns_plain_safe_out,
-    }))
+(define (yaml-parser-parse!/ns-plain-safe self c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-plain-safe",c))
+  (parse-case   c
+    '(
+      (block-key . yaml-parser-parse!/ns-plain-safe-out)
+      (flow-in . yaml-parser-parse!/ns-plain-safe-in)
+      (flow-key . yaml-parser-parse!/ns-plain-safe-in)
+      (flow-out . yaml-parser-parse!/ns-plain-safe-out)
+    )))
 
 
 
@@ -1594,9 +1981,12 @@
 ; ns-plain-safe-out ::=
 ;   ns-char
 
-(define (ns_plain_safe_out self)
-  (when +debug+ (debug-rule "ns_plain_safe_out"))
-  ns_char)
+(define (yaml-parser-parse!/ns-plain-safe-out self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-plain-safe-out"))
+  yaml-parser-parse!/ns-char)
 
 
 
@@ -1604,10 +1994,13 @@
 ; ns-plain-safe-in ::=
 ;   ns-char - c-flow-indicator
 
-(define (ns_plain_safe_in self)
-  (when +debug+ (debug-rule "ns_plain_safe_in"))
-  ((self 'but)   ns_char
-    c_flow_indicator))
+(define (yaml-parser-parse!/ns-plain-safe-in self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-plain-safe-in"))
+  (but     yaml-parser-parse!/ns-char
+      yaml-parser-parse!/c-flow-indicator))
 
 
 
@@ -1617,15 +2010,18 @@
 ;   | ( <an_ns-char_preceding> '#' )
 ;   | ( ':' <followed_by_an_ns-plain-safe(c)> )
 
-(define (ns_plain_char self c)
-  (when +debug+ (debug-rule "ns_plain_char",c))
-  ((self 'any)   ((self 'but)   [ ns_plain_safe, c ]
-      ((self 'chr) ':')
-      ((self 'chr) '#'))
-    ((self 'all)   ((self 'chk) '<=' ns_char)
-      ((self 'chr) '#'))
-    ((self 'all)   ((self 'chr) ':')
-      ((self 'chk) '=' [ ns_plain_safe, c ]))))
+(define (yaml-parser-parse!/ns-plain-char self c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-plain-char",c))
+  (any     (but     (yaml-parser-parse!/ns-plain-safe c)
+          (chr #\:)
+          (chr #\#))
+      (all     (chk '<=' yaml-parser-parse!/ns-char)
+          (chr #\#))
+      (all     (chr #\:)
+          (chk '=' (yaml-parser-parse!/ns-plain-safe c)))))
 
 
 
@@ -1636,15 +2032,18 @@
 ;   ( c = block-key => ns-plain-one-line(c) )
 ;   ( c = flow-key => ns-plain-one-line(c) )
 
-(define (ns_plain self n c)
-  (when +debug+ (debug-rule "ns_plain",nc))
-  ((self 'case)   c
-    {
-      'block-key' => [ ns_plain_one_line, c ],
-      'flow-in' => [ ns_plain_multi_line, n, c ],
-      'flow-key' => [ ns_plain_one_line, c ],
-      'flow-out' => [ ns_plain_multi_line, n, c ],
-    }))
+(define (yaml-parser-parse!/ns-plain self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-plain",nc))
+  (parse-case   c
+    '(
+      (block-key . (yaml-parser-parse!/ns-plain-one-line c))
+      (flow-in . (yaml-parser-parse!/ns-plain-multi-line n c))
+      (flow-key . (yaml-parser-parse!/ns-plain-one-line c))
+      (flow-out . (yaml-parser-parse!/ns-plain-multi-line n c))
+    )))
 
 
 
@@ -1653,12 +2052,15 @@
 ;   ( s-white*
 ;   ns-plain-char(c) )*
 
-(define (nb_ns_plain_in_line self c)
-  (when +debug+ (debug-rule "nb_ns_plain_in_line",c))
-  ((self 'rep)   0
+(define (yaml-parser-parse!/nb-ns-plain-in-line self c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/nb-ns-plain-in-line",c))
+  (rep   0
     #f
-    ((self 'all)   ((self 'rep) 0 #f s_white)
-      [ ns_plain_char, c ])))
+    (all     (rep 0 #f yaml-parser-parse!/s-white)
+        (yaml-parser-parse!/ns-plain-char c))))
 
 
 
@@ -1667,10 +2069,13 @@
 ;   ns-plain-first(c)
 ;   nb-ns-plain-in-line(c)
 
-(define (ns_plain_one_line self c)
-  (when +debug+ (debug-rule "ns_plain_one_line",c))
-  ((self 'all)   [ ns_plain_first, c ]
-    [ nb_ns_plain_in_line, c ]))
+(define (yaml-parser-parse!/ns-plain-one-line self c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-plain-one-line",c))
+  (all     (yaml-parser-parse!/ns-plain-first c)
+      (yaml-parser-parse!/nb-ns-plain-in-line c)))
 
 
 
@@ -1679,11 +2084,14 @@
 ;   s-flow-folded(n)
 ;   ns-plain-char(c) nb-ns-plain-in-line(c)
 
-(define (s_ns_plain_next_line self n c)
-  (when +debug+ (debug-rule "s_ns_plain_next_line",nc))
-  ((self 'all)   [ s_flow_folded, n ]
-    [ ns_plain_char, c ]
-    [ nb_ns_plain_in_line, c ]))
+(define (yaml-parser-parse!/s-ns-plain-next-line self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-ns-plain-next-line",nc))
+  (all     (yaml-parser-parse!/s-flow-folded n)
+      (yaml-parser-parse!/ns-plain-char c)
+      (yaml-parser-parse!/nb-ns-plain-in-line c)))
 
 
 
@@ -1692,10 +2100,13 @@
 ;   ns-plain-one-line(c)
 ;   s-ns-plain-next-line(n,c)*
 
-(define (ns_plain_multi_line self n c)
-  (when +debug+ (debug-rule "ns_plain_multi_line",nc))
-  ((self 'all)   [ ns_plain_one_line, c ]
-    ((self 'rep) 0 #f [ s_ns_plain_next_line, n, c ])))
+(define (yaml-parser-parse!/ns-plain-multi-line self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-plain-multi-line",nc))
+  (all     (yaml-parser-parse!/ns-plain-one-line c)
+      (rep 0 #f (yaml-parser-parse!/s-ns-plain-next-line n c))))
 
 
 
@@ -1706,9 +2117,12 @@
 ;   ( c = block-key => flow-key )
 ;   ( c = flow-key => flow-key )
 
-(define (in_flow self c)
-  (when +debug+ (debug-rule "in_flow",c))
-  ((self 'flip)   c
+(define (yaml-parser-parse!/in-flow self c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/in-flow",c))
+  (flip   c
     {
       'block-key' => "flow-key",
       'flow-in' => "flow-in",
@@ -1723,12 +2137,15 @@
 ;   '[' s-separate(n,c)?
 ;   ns-s-flow-seq-entries(n,in-flow(c))? ']'
 
-(define (c_flow_sequence self n c)
-  (when +debug+ (debug-rule "c_flow_sequence",nc))
-  ((self 'all)   ((self 'chr) '[')
-    ((self 'rep) 0 1 [ s_separate, n, c ])
-    ((self 'rep) 0 1 [ ns_s_flow_seq_entries, n, [ in_flow, c ] ])
-    ((self 'chr) ']')))
+(define (yaml-parser-parse!/c-flow-sequence self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-flow-sequence",nc))
+  (all     (chr #\[)
+      (rep 0 1 (yaml-parser-parse!/s-separate n c))
+      (rep 0 1 (yaml-parser-parse!/ns-s-flow-seq-entries n (yaml-parser-parse!/in-flow c)))
+      (chr #\])))
 
 
 
@@ -1739,15 +2156,18 @@
 ;   ( ',' s-separate(n,c)?
 ;   ns-s-flow-seq-entries(n,c)? )?
 
-(define (ns_s_flow_seq_entries self n c)
-  (when +debug+ (debug-rule "ns_s_flow_seq_entries",nc))
-  ((self 'all)   [ ns_flow_seq_entry, n, c ]
-    ((self 'rep) 0 1 [ s_separate, n, c ])
-    ((self 'rep)   0
-      1
-      ((self 'all)   ((self 'chr) ',')
-        ((self 'rep) 0 1 [ s_separate, n, c ])
-        ((self 'rep) 0 1 [ ns_s_flow_seq_entries, n, c ])))))
+(define (yaml-parser-parse!/ns-s-flow-seq-entries self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-s-flow-seq-entries",nc))
+  (all     (yaml-parser-parse!/ns-flow-seq-entry n c)
+      (rep 0 1 (yaml-parser-parse!/s-separate n c))
+      (rep   0
+        1
+        (all     (chr #\,)
+            (rep 0 1 (yaml-parser-parse!/s-separate n c))
+            (rep 0 1 (yaml-parser-parse!/ns-s-flow-seq-entries n c))))))
 
 
 
@@ -1755,10 +2175,13 @@
 ; ns-flow-seq-entry(n,c) ::=
 ;   ns-flow-pair(n,c) | ns-flow-node(n,c)
 
-(define (ns_flow_seq_entry self n c)
-  (when +debug+ (debug-rule "ns_flow_seq_entry",nc))
-  ((self 'any)   [ ns_flow_pair, n, c ]
-    [ ns_flow_node, n, c ]))
+(define (yaml-parser-parse!/ns-flow-seq-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-seq-entry",nc))
+  (any     (yaml-parser-parse!/ns-flow-pair n c)
+      (yaml-parser-parse!/ns-flow-node n c)))
 
 
 
@@ -1767,12 +2190,15 @@
 ;   '{' s-separate(n,c)?
 ;   ns-s-flow-map-entries(n,in-flow(c))? '}'
 
-(define (c_flow_mapping self n c)
-  (when +debug+ (debug-rule "c_flow_mapping",nc))
-  ((self 'all)   ((self 'chr) '{')
-    ((self 'rep) 0 1 [ s_separate, n, c ])
-    ((self 'rep) 0 1 [ ns_s_flow_map_entries, n, [ in_flow, c ] ])
-    ((self 'chr) '}')))
+(define (yaml-parser-parse!/c-flow-mapping self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-flow-mapping",nc))
+  (all     (chr #\{)
+      (rep 0 1 (yaml-parser-parse!/s-separate n c))
+      (rep 0 1 (yaml-parser-parse!/ns-s-flow-map-entries n (yaml-parser-parse!/in-flow c)))
+      (chr #\})))
 
 
 
@@ -1783,15 +2209,18 @@
 ;   ( ',' s-separate(n,c)?
 ;   ns-s-flow-map-entries(n,c)? )?
 
-(define (ns_s_flow_map_entries self n c)
-  (when +debug+ (debug-rule "ns_s_flow_map_entries",nc))
-  ((self 'all)   [ ns_flow_map_entry, n, c ]
-    ((self 'rep) 0 1 [ s_separate, n, c ])
-    ((self 'rep)   0
-      1
-      ((self 'all)   ((self 'chr) ',')
-        ((self 'rep) 0 1 [ s_separate, n, c ])
-        ((self 'rep) 0 1 [ ns_s_flow_map_entries, n, c ])))))
+(define (yaml-parser-parse!/ns-s-flow-map-entries self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-s-flow-map-entries",nc))
+  (all     (yaml-parser-parse!/ns-flow-map-entry n c)
+      (rep 0 1 (yaml-parser-parse!/s-separate n c))
+      (rep   0
+        1
+        (all     (chr #\,)
+            (rep 0 1 (yaml-parser-parse!/s-separate n c))
+            (rep 0 1 (yaml-parser-parse!/ns-s-flow-map-entries n c))))))
 
 
 
@@ -1801,16 +2230,19 @@
 ;   ns-flow-map-explicit-entry(n,c) )
 ;   | ns-flow-map-implicit-entry(n,c)
 
-(define (ns_flow_map_entry self n c)
-  (when +debug+ (debug-rule "ns_flow_map_entry",nc))
-  ((self 'any)   ((self 'all)   ((self 'chr) '?')
-      ((self 'chk)   '='
-        ((self 'any)   end_of_stream
-          s_white
-          b_break))
-      [ s_separate, n, c ]
-      [ ns_flow_map_explicit_entry, n, c ])
-    [ ns_flow_map_implicit_entry, n, c ]))
+(define (yaml-parser-parse!/ns-flow-map-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-map-entry",nc))
+  (any     (all     (chr #\?)
+          (chk   '='
+            (any     yaml-parser-parse!/end-of-stream
+                yaml-parser-parse!/s-white
+                yaml-parser-parse!/b-break))
+          (yaml-parser-parse!/s-separate n c)
+          (yaml-parser-parse!/ns-flow-map-explicit-entry n c))
+      (yaml-parser-parse!/ns-flow-map-implicit-entry n c)))
 
 
 
@@ -1820,11 +2252,14 @@
 ;   | ( e-node
 ;   e-node )
 
-(define (ns_flow_map_explicit_entry self n c)
-  (when +debug+ (debug-rule "ns_flow_map_explicit_entry",nc))
-  ((self 'any)   [ ns_flow_map_implicit_entry, n, c ]
-    ((self 'all)   e_node
-      e_node)))
+(define (yaml-parser-parse!/ns-flow-map-explicit-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-map-explicit-entry",nc))
+  (any     (yaml-parser-parse!/ns-flow-map-implicit-entry n c)
+      (all     yaml-parser-parse!/e-node
+          yaml-parser-parse!/e-node)))
 
 
 
@@ -1834,11 +2269,14 @@
 ;   | c-ns-flow-map-empty-key-entry(n,c)
 ;   | c-ns-flow-map-json-key-entry(n,c)
 
-(define (ns_flow_map_implicit_entry self n c)
-  (when +debug+ (debug-rule "ns_flow_map_implicit_entry",nc))
-  ((self 'any)   [ ns_flow_map_yaml_key_entry, n, c ]
-    [ c_ns_flow_map_empty_key_entry, n, c ]
-    [ c_ns_flow_map_json_key_entry, n, c ]))
+(define (yaml-parser-parse!/ns-flow-map-implicit-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-map-implicit-entry",nc))
+  (any     (yaml-parser-parse!/ns-flow-map-yaml-key-entry n c)
+      (yaml-parser-parse!/c-ns-flow-map-empty-key-entry n c)
+      (yaml-parser-parse!/c-ns-flow-map-json-key-entry n c)))
 
 
 
@@ -1849,12 +2287,15 @@
 ;   c-ns-flow-map-separate-value(n,c) )
 ;   | e-node )
 
-(define (ns_flow_map_yaml_key_entry self n c)
-  (when +debug+ (debug-rule "ns_flow_map_yaml_key_entry",nc))
-  ((self 'all)   [ ns_flow_yaml_node, n, c ]
-    ((self 'any)   ((self 'all)   ((self 'rep) 0 1 [ s_separate, n, c ])
-        [ c_ns_flow_map_separate_value, n, c ])
-      e_node)))
+(define (yaml-parser-parse!/ns-flow-map-yaml-key-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-map-yaml-key-entry",nc))
+  (all     (yaml-parser-parse!/ns-flow-yaml-node n c)
+      (any     (all     (rep 0 1 (yaml-parser-parse!/s-separate n c))
+              (yaml-parser-parse!/c-ns-flow-map-separate-value n c))
+          yaml-parser-parse!/e-node)))
 
 
 
@@ -1863,10 +2304,13 @@
 ;   e-node
 ;   c-ns-flow-map-separate-value(n,c)
 
-(define (c_ns_flow_map_empty_key_entry self n c)
-  (when +debug+ (debug-rule "c_ns_flow_map_empty_key_entry",nc))
-  ((self 'all)   e_node
-    [ c_ns_flow_map_separate_value, n, c ]))
+(define (yaml-parser-parse!/c-ns-flow-map-empty-key-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-flow-map-empty-key-entry",nc))
+  (all     yaml-parser-parse!/e-node
+      (yaml-parser-parse!/c-ns-flow-map-separate-value n c)))
 
 
 
@@ -1876,13 +2320,16 @@
 ;   ( ( s-separate(n,c) ns-flow-node(n,c) )
 ;   | e-node )
 
-(define (c_ns_flow_map_separate_value self n c)
-  (when +debug+ (debug-rule "c_ns_flow_map_separate_value",nc))
-  ((self 'all)   ((self 'chr) ':')
-    ((self 'chk) '!' [ ns_plain_safe, c ])
-    ((self 'any)   ((self 'all)   [ s_separate, n, c ]
-        [ ns_flow_node, n, c ])
-      e_node)))
+(define (yaml-parser-parse!/c-ns-flow-map-separate-value self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-flow-map-separate-value",nc))
+  (all     (chr #\:)
+      (chk '!' (yaml-parser-parse!/ns-plain-safe c))
+      (any     (all     (yaml-parser-parse!/s-separate n c)
+              (yaml-parser-parse!/ns-flow-node n c))
+          yaml-parser-parse!/e-node)))
 
 
 
@@ -1893,12 +2340,15 @@
 ;   c-ns-flow-map-adjacent-value(n,c) )
 ;   | e-node )
 
-(define (c_ns_flow_map_json_key_entry self n c)
-  (when +debug+ (debug-rule "c_ns_flow_map_json_key_entry",nc))
-  ((self 'all)   [ c_flow_json_node, n, c ]
-    ((self 'any)   ((self 'all)   ((self 'rep) 0 1 [ s_separate, n, c ])
-        [ c_ns_flow_map_adjacent_value, n, c ])
-      e_node)))
+(define (yaml-parser-parse!/c-ns-flow-map-json-key-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-flow-map-json-key-entry",nc))
+  (all     (yaml-parser-parse!/c-flow-json-node n c)
+      (any     (all     (rep 0 1 (yaml-parser-parse!/s-separate n c))
+              (yaml-parser-parse!/c-ns-flow-map-adjacent-value n c))
+          yaml-parser-parse!/e-node)))
 
 
 
@@ -1909,12 +2359,15 @@
 ;   ns-flow-node(n,c) )
 ;   | e-node )
 
-(define (c_ns_flow_map_adjacent_value self n c)
-  (when +debug+ (debug-rule "c_ns_flow_map_adjacent_value",nc))
-  ((self 'all)   ((self 'chr) ':')
-    ((self 'any)   ((self 'all)   ((self 'rep) 0 1 [ s_separate, n, c ])
-        [ ns_flow_node, n, c ])
-      e_node)))
+(define (yaml-parser-parse!/c-ns-flow-map-adjacent-value self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-flow-map-adjacent-value",nc))
+  (all     (chr #\:)
+      (any     (all     (rep 0 1 (yaml-parser-parse!/s-separate n c))
+              (yaml-parser-parse!/ns-flow-node n c))
+          yaml-parser-parse!/e-node)))
 
 
 
@@ -1924,16 +2377,19 @@
 ;   ns-flow-map-explicit-entry(n,c) )
 ;   | ns-flow-pair-entry(n,c)
 
-(define (ns_flow_pair self n c)
-  (when +debug+ (debug-rule "ns_flow_pair",nc))
-  ((self 'any)   ((self 'all)   ((self 'chr) '?')
-      ((self 'chk)   '='
-        ((self 'any)   end_of_stream
-          s_white
-          b_break))
-      [ s_separate, n, c ]
-      [ ns_flow_map_explicit_entry, n, c ])
-    [ ns_flow_pair_entry, n, c ]))
+(define (yaml-parser-parse!/ns-flow-pair self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-pair",nc))
+  (any     (all     (chr #\?)
+          (chk   '='
+            (any     yaml-parser-parse!/end-of-stream
+                yaml-parser-parse!/s-white
+                yaml-parser-parse!/b-break))
+          (yaml-parser-parse!/s-separate n c)
+          (yaml-parser-parse!/ns-flow-map-explicit-entry n c))
+      (yaml-parser-parse!/ns-flow-pair-entry n c)))
 
 
 
@@ -1943,11 +2399,14 @@
 ;   | c-ns-flow-map-empty-key-entry(n,c)
 ;   | c-ns-flow-pair-json-key-entry(n,c)
 
-(define (ns_flow_pair_entry self n c)
-  (when +debug+ (debug-rule "ns_flow_pair_entry",nc))
-  ((self 'any)   [ ns_flow_pair_yaml_key_entry, n, c ]
-    [ c_ns_flow_map_empty_key_entry, n, c ]
-    [ c_ns_flow_pair_json_key_entry, n, c ]))
+(define (yaml-parser-parse!/ns-flow-pair-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-pair-entry",nc))
+  (any     (yaml-parser-parse!/ns-flow-pair-yaml-key-entry n c)
+      (yaml-parser-parse!/c-ns-flow-map-empty-key-entry n c)
+      (yaml-parser-parse!/c-ns-flow-pair-json-key-entry n c)))
 
 
 
@@ -1956,10 +2415,13 @@
 ;   ns-s-implicit-yaml-key(flow-key)
 ;   c-ns-flow-map-separate-value(n,c)
 
-(define (ns_flow_pair_yaml_key_entry self n c)
-  (when +debug+ (debug-rule "ns_flow_pair_yaml_key_entry",nc))
-  ((self 'all)   [ ns_s_implicit_yaml_key, "flow-key" ]
-    [ c_ns_flow_map_separate_value, n, c ]))
+(define (yaml-parser-parse!/ns-flow-pair-yaml-key-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-pair-yaml-key-entry",nc))
+  (all     (yaml-parser-parse!/ns-s-implicit-yaml-key "flow-key")
+      (yaml-parser-parse!/c-ns-flow-map-separate-value n c)))
 
 
 
@@ -1968,10 +2430,13 @@
 ;   c-s-implicit-json-key(flow-key)
 ;   c-ns-flow-map-adjacent-value(n,c)
 
-(define (c_ns_flow_pair_json_key_entry self n c)
-  (when +debug+ (debug-rule "c_ns_flow_pair_json_key_entry",nc))
-  ((self 'all)   [ c_s_implicit_json_key, "flow-key" ]
-    [ c_ns_flow_map_adjacent_value, n, c ]))
+(define (yaml-parser-parse!/c-ns-flow-pair-json-key-entry self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-ns-flow-pair-json-key-entry",nc))
+  (all     (yaml-parser-parse!/c-s-implicit-json-key "flow-key")
+      (yaml-parser-parse!/c-ns-flow-map-adjacent-value n c)))
 
 
 
@@ -1981,11 +2446,14 @@
 ;   s-separate-in-line?
 ;   <at_most_1024_characters_altogether>
 
-(define (ns_s_implicit_yaml_key self c)
-  (when +debug+ (debug-rule "ns_s_implicit_yaml_key",c))
-  ((self 'all)   ((self 'max) 1024)
-    [ ns_flow_yaml_node, #f, c ]
-    ((self 'rep) 0 1 s_separate_in_line)))
+(define (yaml-parser-parse!/ns-s-implicit-yaml-key self c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-s-implicit-yaml-key",c))
+  (all     (max 1024)
+      (yaml-parser-parse!/ns-flow-yaml-node #f c)
+      (rep 0 1 yaml-parser-parse!/s-separate-in-line)))
 
 
 
@@ -1995,11 +2463,14 @@
 ;   s-separate-in-line?
 ;   <at_most_1024_characters_altogether>
 
-(define (c_s_implicit_json_key self c)
-  (when +debug+ (debug-rule "c_s_implicit_json_key",c))
-  ((self 'all)   ((self 'max) 1024)
-    [ c_flow_json_node, #f, c ]
-    ((self 'rep) 0 1 s_separate_in_line)))
+(define (yaml-parser-parse!/c-s-implicit-json-key self c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-s-implicit-json-key",c))
+  (all     (max 1024)
+      (yaml-parser-parse!/c-flow-json-node #f c)
+      (rep 0 1 yaml-parser-parse!/s-separate-in-line)))
 
 
 
@@ -2007,9 +2478,12 @@
 ; ns-flow-yaml-content(n,c) ::=
 ;   ns-plain(n,c)
 
-(define (ns_flow_yaml_content self n c)
-  (when +debug+ (debug-rule "ns_flow_yaml_content",nc))
-  [ ns_plain, n, c ])
+(define (yaml-parser-parse!/ns-flow-yaml-content self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-yaml-content",nc))
+  (yaml-parser-parse!/ns-plain n c))
 
 
 
@@ -2018,12 +2492,15 @@
 ;   c-flow-sequence(n,c) | c-flow-mapping(n,c)
 ;   | c-single-quoted(n,c) | c-double-quoted(n,c)
 
-(define (c_flow_json_content self n c)
-  (when +debug+ (debug-rule "c_flow_json_content",nc))
-  ((self 'any)   [ c_flow_sequence, n, c ]
-    [ c_flow_mapping, n, c ]
-    [ c_single_quoted, n, c ]
-    [ c_double_quoted, n, c ]))
+(define (yaml-parser-parse!/c-flow-json-content self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-flow-json-content",nc))
+  (any     (yaml-parser-parse!/c-flow-sequence n c)
+      (yaml-parser-parse!/c-flow-mapping n c)
+      (yaml-parser-parse!/c-single-quoted n c)
+      (yaml-parser-parse!/c-double-quoted n c)))
 
 
 
@@ -2031,10 +2508,13 @@
 ; ns-flow-content(n,c) ::=
 ;   ns-flow-yaml-content(n,c) | c-flow-json-content(n,c)
 
-(define (ns_flow_content self n c)
-  (when +debug+ (debug-rule "ns_flow_content",nc))
-  ((self 'any)   [ ns_flow_yaml_content, n, c ]
-    [ c_flow_json_content, n, c ]))
+(define (yaml-parser-parse!/ns-flow-content self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-content",nc))
+  (any     (yaml-parser-parse!/ns-flow-yaml-content n c)
+      (yaml-parser-parse!/c-flow-json-content n c)))
 
 
 
@@ -2047,14 +2527,17 @@
 ;   ns-flow-yaml-content(n,c) )
 ;   | e-scalar ) )
 
-(define (ns_flow_yaml_node self n c)
-  (when +debug+ (debug-rule "ns_flow_yaml_node",nc))
-  ((self 'any)   c_ns_alias_node
-    [ ns_flow_yaml_content, n, c ]
-    ((self 'all)   [ c_ns_properties, n, c ]
-      ((self 'any)   ((self 'all)   [ s_separate, n, c ]
-          [ ns_flow_content, n, c ])
-        e_scalar))))
+(define (yaml-parser-parse!/ns-flow-yaml-node self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-yaml-node",nc))
+  (any     yaml-parser-parse!/c-ns-alias-node
+      (yaml-parser-parse!/ns-flow-yaml-content n c)
+      (all     (yaml-parser-parse!/c-ns-properties n c)
+          (any     (all     (yaml-parser-parse!/s-separate n c)
+                  (yaml-parser-parse!/ns-flow-content n c))
+              yaml-parser-parse!/e-scalar))))
 
 
 
@@ -2064,13 +2547,16 @@
 ;   s-separate(n,c) )?
 ;   c-flow-json-content(n,c)
 
-(define (c_flow_json_node self n c)
-  (when +debug+ (debug-rule "c_flow_json_node",nc))
-  ((self 'all)   ((self 'rep)   0
-      1
-      ((self 'all)   [ c_ns_properties, n, c ]
-        [ s_separate, n, c ]))
-    [ c_flow_json_content, n, c ]))
+(define (yaml-parser-parse!/c-flow-json-node self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-flow-json-node",nc))
+  (all     (rep   0
+        1
+        (all     (yaml-parser-parse!/c-ns-properties n c)
+            (yaml-parser-parse!/s-separate n c)))
+      (yaml-parser-parse!/c-flow-json-content n c)))
 
 
 
@@ -2083,14 +2569,17 @@
 ;   ns-flow-content(n,c) )
 ;   | e-scalar ) )
 
-(define (ns_flow_node self n c)
-  (when +debug+ (debug-rule "ns_flow_node",nc))
-  ((self 'any)   c_ns_alias_node
-    [ ns_flow_content, n, c ]
-    ((self 'all)   [ c_ns_properties, n, c ]
-      ((self 'any)   ((self 'all)   [ s_separate, n, c ]
-          [ ns_flow_content, n, c ])
-        e_scalar))))
+(define (yaml-parser-parse!/ns-flow-node self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-flow-node",nc))
+  (any     yaml-parser-parse!/c-ns-alias-node
+      (yaml-parser-parse!/ns-flow-content n c)
+      (all     (yaml-parser-parse!/c-ns-properties n c)
+          (any     (all     (yaml-parser-parse!/s-separate n c)
+                  (yaml-parser-parse!/ns-flow-content n c))
+              yaml-parser-parse!/e-scalar))))
 
 
 
@@ -2102,21 +2591,24 @@
 ;   c-indentation-indicator(m) ) )
 ;   s-b-comment
 
-(define (c_b_block_header self n)
-  (when +debug+ (debug-rule "c_b_block_header",n))
-  ((self 'all)   ((self 'any)   ((self 'all)   [ c_indentation_indicator, n ]
-        c_chomping_indicator
-        ((self 'chk)   '='
-          ((self 'any)   end_of_stream
-            s_white
-            b_break)))
-      ((self 'all)   c_chomping_indicator
-        [ c_indentation_indicator, n ]
-        ((self 'chk)   '='
-          ((self 'any)   end_of_stream
-            s_white
-            b_break))))
-    s_b_comment))
+(define (yaml-parser-parse!/c-b-block-header self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-b-block-header",n))
+  (all     (any     (all     (yaml-parser-parse!/c-indentation-indicator n)
+              yaml-parser-parse!/c-chomping-indicator
+              (chk   '='
+                (any     yaml-parser-parse!/end-of-stream
+                    yaml-parser-parse!/s-white
+                    yaml-parser-parse!/b-break)))
+          (all     yaml-parser-parse!/c-chomping-indicator
+              (yaml-parser-parse!/c-indentation-indicator n)
+              (chk   '='
+                (any     yaml-parser-parse!/end-of-stream
+                    yaml-parser-parse!/s-white
+                    yaml-parser-parse!/b-break))))
+      yaml-parser-parse!/s-b-comment))
 
 
 
@@ -2125,10 +2617,13 @@
 ;   ( ns-dec-digit => m = ns-dec-digit - x:30 )
 ;   ( <empty> => m = auto-detect() )
 
-(define (c_indentation_indicator self n)
-  (when +debug+ (debug-rule "c_indentation_indicator",n))
-  ((self 'any)   ((self 'if) ((self 'rng) "\x{31}" "\x{39}") ((self 'set) 'm' ((self 'ord) match)))
-    ((self 'if) empty ((self 'set) 'm' [ auto_detect, n ]))))
+(define (yaml-parser-parse!/c-indentation-indicator self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-indentation-indicator",n))
+  (any     (if (rng #\x31 #\x39) (set 'm' (ord match)))
+      (if yaml-parser-parse!/empty (set 'm' (yaml-parser-parse!/auto-detect n)))))
 
 
 
@@ -2138,11 +2633,14 @@
 ;   ( '+' => t = keep )
 ;   ( <empty> => t = clip )
 
-(define (c_chomping_indicator self)
-  (when +debug+ (debug-rule "c_chomping_indicator"))
-  ((self 'any)   ((self 'if) ((self 'chr) '-') ((self 'set) 't' "strip"))
-    ((self 'if) ((self 'chr) '+') ((self 'set) 't' "keep"))
-    ((self 'if) empty ((self 'set) 't' "clip"))))
+(define (yaml-parser-parse!/c-chomping-indicator self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-chomping-indicator"))
+  (any     (if (chr #\-) (set 't' "strip"))
+      (if (chr #\+) (set 't' "keep"))
+      (if yaml-parser-parse!/empty (set 't' "clip"))))
 
 
 
@@ -2152,14 +2650,17 @@
 ;   ( t = clip => b-as-line-feed | <end_of_file> )
 ;   ( t = keep => b-as-line-feed | <end_of_file> )
 
-(define (b_chomped_last self t)
-  (when +debug+ (debug-rule "b_chomped_last",t))
-  ((self 'case)   t
-    {
-      'clip' => ((self 'any) b_as_line_feed end_of_stream),
-      'keep' => ((self 'any) b_as_line_feed end_of_stream),
-      'strip' => ((self 'any) b_non_content end_of_stream),
-    }))
+(define (yaml-parser-parse!/b-chomped-last self t)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-chomped-last",t))
+  (parse-case   t
+    '(
+      (clip . (any yaml-parser-parse!/b-as-line-feed yaml-parser-parse!/end-of-stream))
+      (keep . (any yaml-parser-parse!/b-as-line-feed yaml-parser-parse!/end-of-stream))
+      (strip . (any yaml-parser-parse!/b-non-content yaml-parser-parse!/end-of-stream))
+    )))
 
 
 
@@ -2169,14 +2670,17 @@
 ;   ( t = clip => l-strip-empty(n) )
 ;   ( t = keep => l-keep-empty(n) )
 
-(define (l_chomped_empty self n t)
-  (when +debug+ (debug-rule "l_chomped_empty",nt))
-  ((self 'case)   t
-    {
-      'clip' => [ l_strip_empty, n ],
-      'keep' => [ l_keep_empty, n ],
-      'strip' => [ l_strip_empty, n ],
-    }))
+(define (yaml-parser-parse!/l-chomped-empty self n t)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-chomped-empty",nt))
+  (parse-case   t
+    '(
+      (clip . (yaml-parser-parse!/l-strip-empty n))
+      (keep . (yaml-parser-parse!/l-keep-empty n))
+      (strip . (yaml-parser-parse!/l-strip-empty n))
+    )))
 
 
 
@@ -2185,13 +2689,16 @@
 ;   ( s-indent(<=n) b-non-content )*
 ;   l-trail-comments(n)?
 
-(define (l_strip_empty self n)
-  (when +debug+ (debug-rule "l_strip_empty",n))
-  ((self 'all)   ((self 'rep)   0
-      #f
-      ((self 'all)   [ s_indent_le, n ]
-        b_non_content))
-    ((self 'rep) 0 1 [ l_trail_comments, n ])))
+(define (yaml-parser-parse!/l-strip-empty self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-strip-empty",n))
+  (all     (rep   0
+        #f
+        (all     (yaml-parser-parse!/s-indent-le n)
+            yaml-parser-parse!/b-non-content))
+      (rep 0 1 (yaml-parser-parse!/l-trail-comments n))))
 
 
 
@@ -2200,10 +2707,13 @@
 ;   l-empty(n,block-in)*
 ;   l-trail-comments(n)?
 
-(define (l_keep_empty self n)
-  (when +debug+ (debug-rule "l_keep_empty",n))
-  ((self 'all)   ((self 'rep) 0 #f [ l_empty, n, "block-in" ])
-    ((self 'rep) 0 1 [ l_trail_comments, n ])))
+(define (yaml-parser-parse!/l-keep-empty self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-keep-empty",n))
+  (all     (rep 0 #f (yaml-parser-parse!/l-empty n "block-in"))
+      (rep 0 1 (yaml-parser-parse!/l-trail-comments n))))
 
 
 
@@ -2213,12 +2723,15 @@
 ;   c-nb-comment-text b-comment
 ;   l-comment*
 
-(define (l_trail_comments self n)
-  (when +debug+ (debug-rule "l_trail_comments",n))
-  ((self 'all)   [ s_indent_lt, n ]
-    c_nb_comment_text
-    b_comment
-    ((self 'rep) 0 #f l_comment)))
+(define (yaml-parser-parse!/l-trail-comments self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-trail-comments",n))
+  (all     (yaml-parser-parse!/s-indent-lt n)
+      yaml-parser-parse!/c-nb-comment-text
+      yaml-parser-parse!/b-comment
+      (rep 0 #f yaml-parser-parse!/l-comment)))
 
 
 
@@ -2227,11 +2740,14 @@
 ;   '|' c-b-block-header(m,t)
 ;   l-literal-content(n+m,t)
 
-(define (c_l_literal self n)
-  (when +debug+ (debug-rule "c_l_literal",n))
-  ((self 'all)   ((self 'chr) '|')
-    [ c_b_block_header, n ]
-    [ l_literal_content, ((self 'add) n ((self 'm) )), ((self 't) ) ]))
+(define (yaml-parser-parse!/c-l+literal self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-l+literal",n))
+  (all     (chr #\|)
+      (yaml-parser-parse!/c-b-block-header n)
+      (yaml-parser-parse!/l-literal-content (add n (m )) (t ))))
 
 
 
@@ -2240,11 +2756,14 @@
 ;   l-empty(n,block-in)*
 ;   s-indent(n) nb-char+
 
-(define (l_nb_literal_text self n)
-  (when +debug+ (debug-rule "l_nb_literal_text",n))
-  ((self 'all)   ((self 'rep) 0 #f [ l_empty, n, "block-in" ])
-    [ s_indent, n ]
-    ((self 'rep) 1 #f nb_char)))
+(define (yaml-parser-parse!/l-nb-literal-text self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-nb-literal-text",n))
+  (all     (rep 0 #f (yaml-parser-parse!/l-empty n "block-in"))
+      (yaml-parser-parse!/s-indent n)
+      (rep 1 #f yaml-parser-parse!/nb-char)))
 
 
 
@@ -2253,10 +2772,13 @@
 ;   b-as-line-feed
 ;   l-nb-literal-text(n)
 
-(define (b_nb_literal_next self n)
-  (when +debug+ (debug-rule "b_nb_literal_next",n))
-  ((self 'all)   b_as_line_feed
-    [ l_nb_literal_text, n ]))
+(define (yaml-parser-parse!/b-nb-literal-next self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-nb-literal-next",n))
+  (all     yaml-parser-parse!/b-as-line-feed
+      (yaml-parser-parse!/l-nb-literal-text n)))
 
 
 
@@ -2267,14 +2789,17 @@
 ;   b-chomped-last(t) )?
 ;   l-chomped-empty(n,t)
 
-(define (l_literal_content self n t)
-  (when +debug+ (debug-rule "l_literal_content",nt))
-  ((self 'all)   ((self 'rep)   0
-      1
-      ((self 'all)   [ l_nb_literal_text, n ]
-        ((self 'rep) 0 #f [ b_nb_literal_next, n ])
-        [ b_chomped_last, t ]))
-    [ l_chomped_empty, n, t ]))
+(define (yaml-parser-parse!/l-literal-content self n t)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-literal-content",nt))
+  (all     (rep   0
+        1
+        (all     (yaml-parser-parse!/l-nb-literal-text n)
+            (rep 0 #f (yaml-parser-parse!/b-nb-literal-next n))
+            (yaml-parser-parse!/b-chomped-last t)))
+      (yaml-parser-parse!/l-chomped-empty n t)))
 
 
 
@@ -2283,11 +2808,14 @@
 ;   '>' c-b-block-header(m,t)
 ;   l-folded-content(n+m,t)
 
-(define (c_l_folded self n)
-  (when +debug+ (debug-rule "c_l_folded",n))
-  ((self 'all)   ((self 'chr) '>')
-    [ c_b_block_header, n ]
-    [ l_folded_content, ((self 'add) n ((self 'm) )), ((self 't) ) ]))
+(define (yaml-parser-parse!/c-l+folded self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-l+folded",n))
+  (all     (chr #\>)
+      (yaml-parser-parse!/c-b-block-header n)
+      (yaml-parser-parse!/l-folded-content (add n (m )) (t ))))
 
 
 
@@ -2296,11 +2824,14 @@
 ;   s-indent(n) ns-char
 ;   nb-char*
 
-(define (s_nb_folded_text self n)
-  (when +debug+ (debug-rule "s_nb_folded_text",n))
-  ((self 'all)   [ s_indent, n ]
-    ns_char
-    ((self 'rep) 0 #f nb_char)))
+(define (yaml-parser-parse!/s-nb-folded-text self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-nb-folded-text",n))
+  (all     (yaml-parser-parse!/s-indent n)
+      yaml-parser-parse!/ns-char
+      (rep 0 #f yaml-parser-parse!/nb-char)))
 
 
 
@@ -2309,13 +2840,16 @@
 ;   s-nb-folded-text(n)
 ;   ( b-l-folded(n,block-in) s-nb-folded-text(n) )*
 
-(define (l_nb_folded_lines self n)
-  (when +debug+ (debug-rule "l_nb_folded_lines",n))
-  ((self 'all)   [ s_nb_folded_text, n ]
-    ((self 'rep)   0
-      #f
-      ((self 'all)   [ b_l_folded, n, "block-in" ]
-        [ s_nb_folded_text, n ]))))
+(define (yaml-parser-parse!/l-nb-folded-lines self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-nb-folded-lines",n))
+  (all     (yaml-parser-parse!/s-nb-folded-text n)
+      (rep   0
+        #f
+        (all     (yaml-parser-parse!/b-l-folded n "block-in")
+            (yaml-parser-parse!/s-nb-folded-text n)))))
 
 
 
@@ -2324,11 +2858,14 @@
 ;   s-indent(n) s-white
 ;   nb-char*
 
-(define (s_nb_spaced_text self n)
-  (when +debug+ (debug-rule "s_nb_spaced_text",n))
-  ((self 'all)   [ s_indent, n ]
-    s_white
-    ((self 'rep) 0 #f nb_char)))
+(define (yaml-parser-parse!/s-nb-spaced-text self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-nb-spaced-text",n))
+  (all     (yaml-parser-parse!/s-indent n)
+      yaml-parser-parse!/s-white
+      (rep 0 #f yaml-parser-parse!/nb-char)))
 
 
 
@@ -2337,10 +2874,13 @@
 ;   b-as-line-feed
 ;   l-empty(n,block-in)*
 
-(define (b_l_spaced self n)
-  (when +debug+ (debug-rule "b_l_spaced",n))
-  ((self 'all)   b_as_line_feed
-    ((self 'rep) 0 #f [ l_empty, n, "block-in" ])))
+(define (yaml-parser-parse!/b-l-spaced self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/b-l-spaced",n))
+  (all     yaml-parser-parse!/b-as-line-feed
+      (rep 0 #f (yaml-parser-parse!/l-empty n "block-in"))))
 
 
 
@@ -2349,13 +2889,16 @@
 ;   s-nb-spaced-text(n)
 ;   ( b-l-spaced(n) s-nb-spaced-text(n) )*
 
-(define (l_nb_spaced_lines self n)
-  (when +debug+ (debug-rule "l_nb_spaced_lines",n))
-  ((self 'all)   [ s_nb_spaced_text, n ]
-    ((self 'rep)   0
-      #f
-      ((self 'all)   [ b_l_spaced, n ]
-        [ s_nb_spaced_text, n ]))))
+(define (yaml-parser-parse!/l-nb-spaced-lines self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-nb-spaced-lines",n))
+  (all     (yaml-parser-parse!/s-nb-spaced-text n)
+      (rep   0
+        #f
+        (all     (yaml-parser-parse!/b-l-spaced n)
+            (yaml-parser-parse!/s-nb-spaced-text n)))))
 
 
 
@@ -2364,11 +2907,14 @@
 ;   l-empty(n,block-in)*
 ;   ( l-nb-folded-lines(n) | l-nb-spaced-lines(n) )
 
-(define (l_nb_same_lines self n)
-  (when +debug+ (debug-rule "l_nb_same_lines",n))
-  ((self 'all)   ((self 'rep) 0 #f [ l_empty, n, "block-in" ])
-    ((self 'any)   [ l_nb_folded_lines, n ]
-      [ l_nb_spaced_lines, n ])))
+(define (yaml-parser-parse!/l-nb-same-lines self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-nb-same-lines",n))
+  (all     (rep 0 #f (yaml-parser-parse!/l-empty n "block-in"))
+      (any     (yaml-parser-parse!/l-nb-folded-lines n)
+          (yaml-parser-parse!/l-nb-spaced-lines n))))
 
 
 
@@ -2377,13 +2923,16 @@
 ;   l-nb-same-lines(n)
 ;   ( b-as-line-feed l-nb-same-lines(n) )*
 
-(define (l_nb_diff_lines self n)
-  (when +debug+ (debug-rule "l_nb_diff_lines",n))
-  ((self 'all)   [ l_nb_same_lines, n ]
-    ((self 'rep)   0
-      #f
-      ((self 'all)   b_as_line_feed
-        [ l_nb_same_lines, n ]))))
+(define (yaml-parser-parse!/l-nb-diff-lines self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-nb-diff-lines",n))
+  (all     (yaml-parser-parse!/l-nb-same-lines n)
+      (rep   0
+        #f
+        (all     yaml-parser-parse!/b-as-line-feed
+            (yaml-parser-parse!/l-nb-same-lines n)))))
 
 
 
@@ -2393,13 +2942,16 @@
 ;   b-chomped-last(t) )?
 ;   l-chomped-empty(n,t)
 
-(define (l_folded_content self n t)
-  (when +debug+ (debug-rule "l_folded_content",nt))
-  ((self 'all)   ((self 'rep)   0
-      1
-      ((self 'all)   [ l_nb_diff_lines, n ]
-        [ b_chomped_last, t ]))
-    [ l_chomped_empty, n, t ]))
+(define (yaml-parser-parse!/l-folded-content self n t)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-folded-content",nt))
+  (all     (rep   0
+        1
+        (all     (yaml-parser-parse!/l-nb-diff-lines n)
+            (yaml-parser-parse!/b-chomped-last t)))
+      (yaml-parser-parse!/l-chomped-empty n t)))
 
 
 
@@ -2409,12 +2961,15 @@
 ;   c-l-block-seq-entry(n+m) )+
 ;   <for_some_fixed_auto-detected_m_>_0>
 
-(define (l_block_sequence self n)
-  (when +debug+ (debug-rule "l_block_sequence",n))
-  ((self 'all)   ((self 'rep)   1
-      #f
-      ((self 'all)   [ s_indent, ((self 'add) n m) ]
-        [ c_l_block_seq_entry, ((self 'add) n m) ]))))
+(define (yaml-parser-parse!/l+block-sequence self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l+block-sequence",n))
+  (all     (rep   1
+        #f
+        (all     (yaml-parser-parse!/s-indent (add n m))
+            (yaml-parser-parse!/c-l-block-seq-entry (add n m))))))
 
 
 
@@ -2423,11 +2978,14 @@
 ;   '-' <not_followed_by_an_ns-char>
 ;   s-l+block-indented(n,block-in)
 
-(define (c_l_block_seq_entry self n)
-  (when +debug+ (debug-rule "c_l_block_seq_entry",n))
-  ((self 'all)   ((self 'chr) '-')
-    ((self 'chk) '!' ns_char)
-    [ s_l_block_indented, n, "block-in" ]))
+(define (yaml-parser-parse!/c-l-block-seq-entry self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-l-block-seq-entry",n))
+  (all     (chr #\-)
+      (chk '!' yaml-parser-parse!/ns-char)
+      (yaml-parser-parse!/s-l+block-indented n "block-in")))
 
 
 
@@ -2439,14 +2997,17 @@
 ;   | s-l+block-node(n,c)
 ;   | ( e-node s-l-comments )
 
-(define (s_l_block_indented self n c)
-  (when +debug+ (debug-rule "s_l_block_indented",nc))
-  ((self 'any)   ((self 'all)   [ s_indent, m ]
-      ((self 'any)   [ ns_l_compact_sequence, ((self 'add) n ((self 'add) 1 m)) ]
-        [ ns_l_compact_mapping, ((self 'add) n ((self 'add) 1 m)) ]))
-    [ s_l_block_node, n, c ]
-    ((self 'all)   e_node
-      s_l_comments)))
+(define (yaml-parser-parse!/s-l+block-indented self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-l+block-indented",nc))
+  (any     (all     (yaml-parser-parse!/s-indent m)
+          (any     (yaml-parser-parse!/ns-l-compact-sequence (add n (add 1 m)))
+              (yaml-parser-parse!/ns-l-compact-mapping (add n (add 1 m)))))
+      (yaml-parser-parse!/s-l+block-node n c)
+      (all     yaml-parser-parse!/e-node
+          yaml-parser-parse!/s-l-comments)))
 
 
 
@@ -2455,13 +3016,16 @@
 ;   c-l-block-seq-entry(n)
 ;   ( s-indent(n) c-l-block-seq-entry(n) )*
 
-(define (ns_l_compact_sequence self n)
-  (when +debug+ (debug-rule "ns_l_compact_sequence",n))
-  ((self 'all)   [ c_l_block_seq_entry, n ]
-    ((self 'rep)   0
-      #f
-      ((self 'all)   [ s_indent, n ]
-        [ c_l_block_seq_entry, n ]))))
+(define (yaml-parser-parse!/ns-l-compact-sequence self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-l-compact-sequence",n))
+  (all     (yaml-parser-parse!/c-l-block-seq-entry n)
+      (rep   0
+        #f
+        (all     (yaml-parser-parse!/s-indent n)
+            (yaml-parser-parse!/c-l-block-seq-entry n)))))
 
 
 
@@ -2471,12 +3035,15 @@
 ;   ns-l-block-map-entry(n+m) )+
 ;   <for_some_fixed_auto-detected_m_>_0>
 
-(define (l_block_mapping self n)
-  (when +debug+ (debug-rule "l_block_mapping",n))
-  ((self 'all)   ((self 'rep)   1
-      #f
-      ((self 'all)   [ s_indent, ((self 'add) n m) ]
-        [ ns_l_block_map_entry, ((self 'add) n m) ]))))
+(define (yaml-parser-parse!/l+block-mapping self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l+block-mapping",n))
+  (all     (rep   1
+        #f
+        (all     (yaml-parser-parse!/s-indent (add n m))
+            (yaml-parser-parse!/ns-l-block-map-entry (add n m))))))
 
 
 
@@ -2485,10 +3052,13 @@
 ;   c-l-block-map-explicit-entry(n)
 ;   | ns-l-block-map-implicit-entry(n)
 
-(define (ns_l_block_map_entry self n)
-  (when +debug+ (debug-rule "ns_l_block_map_entry",n))
-  ((self 'any)   [ c_l_block_map_explicit_entry, n ]
-    [ ns_l_block_map_implicit_entry, n ]))
+(define (yaml-parser-parse!/ns-l-block-map-entry self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-l-block-map-entry",n))
+  (any     (yaml-parser-parse!/c-l-block-map-explicit-entry n)
+      (yaml-parser-parse!/ns-l-block-map-implicit-entry n)))
 
 
 
@@ -2498,11 +3068,14 @@
 ;   ( l-block-map-explicit-value(n)
 ;   | e-node )
 
-(define (c_l_block_map_explicit_entry self n)
-  (when +debug+ (debug-rule "c_l_block_map_explicit_entry",n))
-  ((self 'all)   [ c_l_block_map_explicit_key, n ]
-    ((self 'any)   [ l_block_map_explicit_value, n ]
-      e_node)))
+(define (yaml-parser-parse!/c-l-block-map-explicit-entry self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-l-block-map-explicit-entry",n))
+  (all     (yaml-parser-parse!/c-l-block-map-explicit-key n)
+      (any     (yaml-parser-parse!/l-block-map-explicit-value n)
+          yaml-parser-parse!/e-node)))
 
 
 
@@ -2511,14 +3084,17 @@
 ;   '?'
 ;   s-l+block-indented(n,block-out)
 
-(define (c_l_block_map_explicit_key self n)
-  (when +debug+ (debug-rule "c_l_block_map_explicit_key",n))
-  ((self 'all)   ((self 'chr) '?')
-    ((self 'chk)   '='
-      ((self 'any)   end_of_stream
-        s_white
-        b_break))
-    [ s_l_block_indented, n, "block-out" ]))
+(define (yaml-parser-parse!/c-l-block-map-explicit-key self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-l-block-map-explicit-key",n))
+  (all     (chr #\?)
+      (chk   '='
+        (any     yaml-parser-parse!/end-of-stream
+            yaml-parser-parse!/s-white
+            yaml-parser-parse!/b-break))
+      (yaml-parser-parse!/s-l+block-indented n "block-out")))
 
 
 
@@ -2527,11 +3103,14 @@
 ;   s-indent(n)
 ;   ':' s-l+block-indented(n,block-out)
 
-(define (l_block_map_explicit_value self n)
-  (when +debug+ (debug-rule "l_block_map_explicit_value",n))
-  ((self 'all)   [ s_indent, n ]
-    ((self 'chr) ':')
-    [ s_l_block_indented, n, "block-out" ]))
+(define (yaml-parser-parse!/l-block-map-explicit-value self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-block-map-explicit-value",n))
+  (all     (yaml-parser-parse!/s-indent n)
+      (chr #\:)
+      (yaml-parser-parse!/s-l+block-indented n "block-out")))
 
 
 
@@ -2542,11 +3121,14 @@
 ;   | e-node )
 ;   c-l-block-map-implicit-value(n)
 
-(define (ns_l_block_map_implicit_entry self n)
-  (when +debug+ (debug-rule "ns_l_block_map_implicit_entry",n))
-  ((self 'all)   ((self 'any)   ns_s_block_map_implicit_key
-      e_node)
-    [ c_l_block_map_implicit_value, n ]))
+(define (yaml-parser-parse!/ns-l-block-map-implicit-entry self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-l-block-map-implicit-entry",n))
+  (all     (any     yaml-parser-parse!/ns-s-block-map-implicit-key
+          yaml-parser-parse!/e-node)
+      (yaml-parser-parse!/c-l-block-map-implicit-value n)))
 
 
 
@@ -2555,10 +3137,13 @@
 ;   c-s-implicit-json-key(block-key)
 ;   | ns-s-implicit-yaml-key(block-key)
 
-(define (ns_s_block_map_implicit_key self)
-  (when +debug+ (debug-rule "ns_s_block_map_implicit_key"))
-  ((self 'any)   [ c_s_implicit_json_key, "block-key" ]
-    [ ns_s_implicit_yaml_key, "block-key" ]))
+(define (yaml-parser-parse!/ns-s-block-map-implicit-key self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-s-block-map-implicit-key"))
+  (any     (yaml-parser-parse!/c-s-implicit-json-key "block-key")
+      (yaml-parser-parse!/ns-s-implicit-yaml-key "block-key")))
 
 
 
@@ -2568,12 +3153,15 @@
 ;   s-l+block-node(n,block-out)
 ;   | ( e-node s-l-comments ) )
 
-(define (c_l_block_map_implicit_value self n)
-  (when +debug+ (debug-rule "c_l_block_map_implicit_value",n))
-  ((self 'all)   ((self 'chr) ':')
-    ((self 'any)   [ s_l_block_node, n, "block-out" ]
-      ((self 'all)   e_node
-        s_l_comments))))
+(define (yaml-parser-parse!/c-l-block-map-implicit-value self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-l-block-map-implicit-value",n))
+  (all     (chr #\:)
+      (any     (yaml-parser-parse!/s-l+block-node n "block-out")
+          (all     yaml-parser-parse!/e-node
+              yaml-parser-parse!/s-l-comments))))
 
 
 
@@ -2582,13 +3170,16 @@
 ;   ns-l-block-map-entry(n)
 ;   ( s-indent(n) ns-l-block-map-entry(n) )*
 
-(define (ns_l_compact_mapping self n)
-  (when +debug+ (debug-rule "ns_l_compact_mapping",n))
-  ((self 'all)   [ ns_l_block_map_entry, n ]
-    ((self 'rep)   0
-      #f
-      ((self 'all)   [ s_indent, n ]
-        [ ns_l_block_map_entry, n ]))))
+(define (yaml-parser-parse!/ns-l-compact-mapping self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/ns-l-compact-mapping",n))
+  (all     (yaml-parser-parse!/ns-l-block-map-entry n)
+      (rep   0
+        #f
+        (all     (yaml-parser-parse!/s-indent n)
+            (yaml-parser-parse!/ns-l-block-map-entry n)))))
 
 
 
@@ -2596,10 +3187,13 @@
 ; s-l+block-node(n,c) ::=
 ;   s-l+block-in-block(n,c) | s-l+flow-in-block(n)
 
-(define (s_l_block_node self n c)
-  (when +debug+ (debug-rule "s_l_block_node",nc))
-  ((self 'any)   [ s_l_block_in_block, n, c ]
-    [ s_l_flow_in_block, n ]))
+(define (yaml-parser-parse!/s-l+block-node self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-l+block-node",nc))
+  (any     (yaml-parser-parse!/s-l+block-in-block n c)
+      (yaml-parser-parse!/s-l+flow-in-block n)))
 
 
 
@@ -2608,11 +3202,14 @@
 ;   s-separate(n+1,flow-out)
 ;   ns-flow-node(n+1,flow-out) s-l-comments
 
-(define (s_l_flow_in_block self n)
-  (when +debug+ (debug-rule "s_l_flow_in_block",n))
-  ((self 'all)   [ s_separate, ((self 'add) n 1), "flow-out" ]
-    [ ns_flow_node, ((self 'add) n 1), "flow-out" ]
-    s_l_comments))
+(define (yaml-parser-parse!/s-l+flow-in-block self n)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-l+flow-in-block",n))
+  (all     (yaml-parser-parse!/s-separate (add n 1) "flow-out")
+      (yaml-parser-parse!/ns-flow-node (add n 1) "flow-out")
+      yaml-parser-parse!/s-l-comments))
 
 
 
@@ -2620,10 +3217,13 @@
 ; s-l+block-in-block(n,c) ::=
 ;   s-l+block-scalar(n,c) | s-l+block-collection(n,c)
 
-(define (s_l_block_in_block self n c)
-  (when +debug+ (debug-rule "s_l_block_in_block",nc))
-  ((self 'any)   [ s_l_block_scalar, n, c ]
-    [ s_l_block_collection, n, c ]))
+(define (yaml-parser-parse!/s-l+block-in-block self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-l+block-in-block",nc))
+  (any     (yaml-parser-parse!/s-l+block-scalar n c)
+      (yaml-parser-parse!/s-l+block-collection n c)))
 
 
 
@@ -2633,15 +3233,18 @@
 ;   ( c-ns-properties(n+1,c) s-separate(n+1,c) )?
 ;   ( c-l+literal(n) | c-l+folded(n) )
 
-(define (s_l_block_scalar self n c)
-  (when +debug+ (debug-rule "s_l_block_scalar",nc))
-  ((self 'all)   [ s_separate, ((self 'add) n 1), c ]
-    ((self 'rep)   0
-      1
-      ((self 'all)   [ c_ns_properties, ((self 'add) n 1), c ]
-        [ s_separate, ((self 'add) n 1), c ]))
-    ((self 'any)   [ c_l_literal, n ]
-      [ c_l_folded, n ])))
+(define (yaml-parser-parse!/s-l+block-scalar self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-l+block-scalar",nc))
+  (all     (yaml-parser-parse!/s-separate (add n 1) c)
+      (rep   0
+        1
+        (all     (yaml-parser-parse!/c-ns-properties (add n 1) c)
+            (yaml-parser-parse!/s-separate (add n 1) c)))
+      (any     (yaml-parser-parse!/c-l+literal n)
+          (yaml-parser-parse!/c-l+folded n))))
 
 
 
@@ -2653,20 +3256,23 @@
 ;   ( l+block-sequence(seq-spaces(n,c))
 ;   | l+block-mapping(n) )
 
-(define (s_l_block_collection self n c)
-  (when +debug+ (debug-rule "s_l_block_collection",nc))
-  ((self 'all)   ((self 'rep)   0
-      1
-      ((self 'all)   [ s_separate, ((self 'add) n 1), c ]
-        ((self 'any)   ((self 'all)   [ c_ns_properties, ((self 'add) n 1), c ]
-            s_l_comments)
-          ((self 'all)   c_ns_tag_property
-            s_l_comments)
-          ((self 'all)   c_ns_anchor_property
-            s_l_comments))))
-    s_l_comments
-    ((self 'any)   [ l_block_sequence, [ seq_spaces, n, c ] ]
-      [ l_block_mapping, n ])))
+(define (yaml-parser-parse!/s-l+block-collection self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/s-l+block-collection",nc))
+  (all     (rep   0
+        1
+        (all     (yaml-parser-parse!/s-separate (add n 1) c)
+            (any     (all     (yaml-parser-parse!/c-ns-properties (add n 1) c)
+                    yaml-parser-parse!/s-l-comments)
+                (all     yaml-parser-parse!/c-ns-tag-property
+                    yaml-parser-parse!/s-l-comments)
+                (all     yaml-parser-parse!/c-ns-anchor-property
+                    yaml-parser-parse!/s-l-comments))))
+      yaml-parser-parse!/s-l-comments
+      (any     (yaml-parser-parse!/l+block-sequence (yaml-parser-parse!/seq-spaces n c))
+          (yaml-parser-parse!/l+block-mapping n))))
 
 
 
@@ -2675,12 +3281,15 @@
 ;   ( c = block-out => n-1 )
 ;   ( c = block-in => n )
 
-(define (seq_spaces self n c)
-  (when +debug+ (debug-rule "seq_spaces",nc))
-  ((self 'flip)   c
+(define (yaml-parser-parse!/seq-spaces self n c)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/seq-spaces",nc))
+  (flip   c
     {
       'block-in' => n,
-      'block-out' => ((self 'sub) n 1),
+      'block-out' => (sub n 1),
     }))
 
 
@@ -2689,10 +3298,13 @@
 ; l-document-prefix ::=
 ;   c-byte-order-mark? l-comment*
 
-(define (l_document_prefix self)
-  (when +debug+ (debug-rule "l_document_prefix"))
-  ((self 'all)   ((self 'rep) 0 1 c_byte_order_mark)
-    ((self 'rep) 0 #f l_comment)))
+(define (yaml-parser-parse!/l-document-prefix self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-document-prefix"))
+  (all     (rep 0 1 yaml-parser-parse!/c-byte-order-mark)
+      (rep 0 #f yaml-parser-parse!/l-comment)))
 
 
 
@@ -2700,15 +3312,18 @@
 ; c-directives-end ::=
 ;   '-' '-' '-'
 
-(define (c_directives_end self)
-  (when +debug+ (debug-rule "c_directives_end"))
-  ((self 'all)   ((self 'chr) '-')
-    ((self 'chr) '-')
-    ((self 'chr) '-')
-    ((self 'chk)   '='
-      ((self 'any)   end_of_stream
-        s_white
-        b_break))))
+(define (yaml-parser-parse!/c-directives-end self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-directives-end"))
+  (all     (chr #\-)
+      (chr #\-)
+      (chr #\-)
+      (chk   '='
+        (any     yaml-parser-parse!/end-of-stream
+            yaml-parser-parse!/s-white
+            yaml-parser-parse!/b-break))))
 
 
 
@@ -2716,11 +3331,14 @@
 ; c-document-end ::=
 ;   '.' '.' '.'
 
-(define (c_document_end self)
-  (when +debug+ (debug-rule "c_document_end"))
-  ((self 'all)   ((self 'chr) '.')
-    ((self 'chr) '.')
-    ((self 'chr) '.')))
+(define (yaml-parser-parse!/c-document-end self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-document-end"))
+  (all     (chr #\.)
+      (chr #\.)
+      (chr #\.)))
 
 
 
@@ -2728,10 +3346,13 @@
 ; l-document-suffix ::=
 ;   c-document-end s-l-comments
 
-(define (l_document_suffix self)
-  (when +debug+ (debug-rule "l_document_suffix"))
-  ((self 'all)   c_document_end
-    s_l_comments))
+(define (yaml-parser-parse!/l-document-suffix self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-document-suffix"))
+  (all     yaml-parser-parse!/c-document-end
+      yaml-parser-parse!/s-l-comments))
 
 
 
@@ -2741,14 +3362,17 @@
 ;   ( c-directives-end | c-document-end )
 ;   ( b-char | s-white | <end_of_file> )
 
-(define (c_forbidden self)
-  (when +debug+ (debug-rule "c_forbidden"))
-  ((self 'all)   start_of_line
-    ((self 'any)   c_directives_end
-      c_document_end)
-    ((self 'any)   b_char
-      s_white
-      end_of_stream)))
+(define (yaml-parser-parse!/c-forbidden self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/c-forbidden"))
+  (all     yaml-parser-parse!/start-of-line
+      (any     yaml-parser-parse!/c-directives-end
+          yaml-parser-parse!/c-document-end)
+      (any     yaml-parser-parse!/b-char
+          yaml-parser-parse!/s-white
+          yaml-parser-parse!/end-of-stream)))
 
 
 
@@ -2757,10 +3381,13 @@
 ;   s-l+block-node(-1,block-in)
 ;   <excluding_c-forbidden_content>
 
-(define (l_bare_document self)
-  (when +debug+ (debug-rule "l_bare_document"))
-  ((self 'all)   ((self 'exclude) c_forbidden)
-    [ s_l_block_node, -1, "block-in" ]))
+(define (yaml-parser-parse!/l-bare-document self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-bare-document"))
+  (all     (exclude yaml-parser-parse!/c-forbidden)
+      (yaml-parser-parse!/s-l+block-node -1 "block-in")))
 
 
 
@@ -2770,12 +3397,15 @@
 ;   ( l-bare-document
 ;   | ( e-node s-l-comments ) )
 
-(define (l_explicit_document self)
-  (when +debug+ (debug-rule "l_explicit_document"))
-  ((self 'all)   c_directives_end
-    ((self 'any)   l_bare_document
-      ((self 'all)   e_node
-        s_l_comments))))
+(define (yaml-parser-parse!/l-explicit-document self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-explicit-document"))
+  (all     yaml-parser-parse!/c-directives-end
+      (any     yaml-parser-parse!/l-bare-document
+          (all     yaml-parser-parse!/e-node
+              yaml-parser-parse!/s-l-comments))))
 
 
 
@@ -2784,10 +3414,13 @@
 ;   l-directive+
 ;   l-explicit-document
 
-(define (l_directive_document self)
-  (when +debug+ (debug-rule "l_directive_document"))
-  ((self 'all)   ((self 'rep) 1 #f l_directive)
-    l_explicit_document))
+(define (yaml-parser-parse!/l-directive-document self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-directive-document"))
+  (all     (rep 1 #f yaml-parser-parse!/l-directive)
+      yaml-parser-parse!/l-explicit-document))
 
 
 
@@ -2797,11 +3430,14 @@
 ;   | l-explicit-document
 ;   | l-bare-document
 
-(define (l_any_document self)
-  (when +debug+ (debug-rule "l_any_document"))
-  ((self 'any)   l_directive_document
-    l_explicit_document
-    l_bare_document))
+(define (yaml-parser-parse!/l-any-document self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-any-document"))
+  (any     yaml-parser-parse!/l-directive-document
+      yaml-parser-parse!/l-explicit-document
+      yaml-parser-parse!/l-bare-document))
 
 
 
@@ -2812,15 +3448,21 @@
 ;   l-any-document? )
 ;   | ( l-document-prefix* l-explicit-document? ) )*
 
-(define (l_yaml_stream self)
-  (when +debug+ (debug-rule "l_yaml_stream"))
-  ((self 'all)   l_document_prefix
-    ((self 'rep) 0 1 l_any_document)
-    ((self 'rep)   0
-      #f
-      ((self 'any)   ((self 'all)   l_document_suffix
-          ((self 'rep) 0 #f l_document_prefix)
-          ((self 'rep) 0 1 l_any_document))
-        ((self 'all)   l_document_prefix
-          ((self 'rep) 0 1 l_explicit_document))))))
+(define (yaml-parser-parse!/l-yaml-stream self)
+  (unless (yaml-parser? self)
+    (error "not a yaml parser: " self))
+  (when +debug+
+    (debug-rule "yaml-parser-parse!/l-yaml-stream"))
+  (all     yaml-parser-parse!/l-document-prefix
+      (rep 0 1 yaml-parser-parse!/l-any-document)
+      (rep   0
+        #f
+        (any     (all     yaml-parser-parse!/l-document-suffix
+                (rep 0 #f yaml-parser-parse!/l-document-prefix)
+                (rep 0 1 yaml-parser-parse!/l-any-document))
+            (all     yaml-parser-parse!/l-document-prefix
+                (rep 0 1 yaml-parser-parse!/l-explicit-document))))))
 
+
+
+    
